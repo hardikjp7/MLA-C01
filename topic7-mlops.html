@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 7: Machine Learning Operations (MLOps)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700;900&family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --bg:#070b0e;--s1:#0c1117;--s2:#111820;--bd:#1a2530;
+    --teal:#14b8a6;--blue:#3b82f6;--violet:#8b5cf6;--green:#22c55e;
+    --yellow:#eab308;--orange:#f97316;--pink:#ec4899;--red:#ef4444;
+    --sky:#0ea5e9;--lime:#84cc16;--amber:#f59e0b;--cyan:#06b6d4;
+    --text:#d8e8f0;--dim:#4a6070;
+    --mono:'Inconsolata',monospace;--sans:'Inter',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12px;line-height:1.5;padding:18px;}
+
+  .hdr{background:linear-gradient(135deg,#070b0e,#0c1528,#070b0e);border:1px solid var(--teal);border-radius:12px;padding:18px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .hdr::after{content:'⚙';position:absolute;right:20px;top:10px;font-size:80px;color:rgba(20,184,166,0.06);pointer-events:none;}
+  .hr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+  .tn{font-family:var(--mono);font-size:11px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;}
+  h1{font-size:22px;font-weight:800;background:linear-gradient(90deg,var(--teal),var(--blue),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:4px 0 2px;}
+  .sub{color:var(--dim);font-size:11px;}
+  .bdg{background:var(--teal);color:#000;font-family:var(--mono);font-size:10px;font-weight:900;padding:3px 9px;border-radius:4px;letter-spacing:1px;}
+
+  .sec{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:3px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+  .full{margin-bottom:10px;}
+
+  .c{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:11px;}
+  .c-t{border-top:3px solid var(--teal);}  .c-b{border-top:3px solid var(--blue);}
+  .c-v{border-top:3px solid var(--violet);}  .c-g{border-top:3px solid var(--green);}
+  .c-y{border-top:3px solid var(--yellow);}  .c-o{border-top:3px solid var(--orange);}
+  .c-p{border-top:3px solid var(--pink);}   .c-r{border-top:3px solid var(--red);}
+  .c-sky{border-top:3px solid var(--sky);}  .c-lime{border-top:3px solid var(--lime);}
+  .c-a{border-top:3px solid var(--amber);}  .c-c{border-top:3px solid var(--cyan);}
+
+  .ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+  .tl{color:var(--teal);}.bl{color:var(--blue);}.vl{color:var(--violet);}.gr{color:var(--green);}
+  .yl{color:var(--yellow);}.or{color:var(--orange);}.pk{color:var(--pink);}.rd{color:var(--red);}
+  .sk{color:var(--sky);}.lm{color:var(--lime);}.am{color:var(--amber);}.cy{color:var(--cyan);}
+
+  ul.cl{list-style:none;}
+  ul.cl li{padding:2px 0 2px 13px;position:relative;color:var(--dim);font-size:11.5px;}
+  ul.cl li::before{content:'▸';position:absolute;left:0;color:var(--teal);font-size:9px;top:5px;}
+  ul.cl li strong{color:var(--text);}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;}
+  .t-t{background:rgba(20,184,166,.1);color:var(--teal);border:1px solid rgba(20,184,166,.2);}
+  .t-b{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.2);}
+  .t-v{background:rgba(139,92,246,.12);color:var(--violet);border:1px solid rgba(139,92,246,.2);}
+  .t-g{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+  .t-y{background:rgba(234,179,8,.1);color:var(--yellow);border:1px solid rgba(234,179,8,.2);}
+  .t-o{background:rgba(249,115,22,.1);color:var(--orange);border:1px solid rgba(249,115,22,.2);}
+  .t-p{background:rgba(236,72,153,.1);color:var(--pink);border:1px solid rgba(236,72,153,.2);}
+  .t-r{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);}
+  .t-a{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+  .t-c{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.2);}
+  .t-sky{background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.2);}
+
+  .ty{background:rgba(234,179,8,.05);border:1px solid rgba(234,179,8,.15);border-left:3px solid var(--yellow);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .ty strong{color:var(--yellow);}
+  .tr{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-left:3px solid var(--red);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tr strong{color:var(--red);}
+  .tg{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-left:3px solid var(--green);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tg strong{color:var(--green);}
+  .tt{background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.15);border-left:3px solid var(--teal);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tt strong{color:var(--teal);}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--s2);padding:5px 8px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--bd);}
+  .tbl td{padding:5px 8px;border-bottom:1px solid rgba(26,37,48,.6);color:var(--dim);vertical-align:top;}
+  .tbl td:first-child{color:var(--text);font-weight:600;}
+  .tbl tr:last-child td{border-bottom:none;}
+
+  /* PIPELINE FLOW */
+  .pipe{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:6px 0;}
+  .ps{background:var(--s2);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;font-size:10px;color:var(--text);font-weight:700;}
+  .pa{color:var(--teal);font-size:13px;font-weight:900;}
+
+  /* DEPLOY CARDS */
+  .deploy-row{display:grid;grid-template-columns:90px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid rgba(26,37,48,.5);font-size:11px;align-items:start;}
+  .deploy-row:last-child{border-bottom:none;}
+  .deploy-label{font-family:var(--mono);font-size:10px;font-weight:700;}
+
+  /* CONTAINER TREE */
+  .tree{background:var(--s2);border-radius:5px;padding:7px;font-family:var(--mono);font-size:10px;color:var(--dim);margin:5px 0;}
+  .tree-h{color:var(--teal);font-weight:700;}
+
+  /* STATE BOX */
+  .state{background:var(--s2);border-radius:5px;padding:6px 8px;margin-bottom:5px;}
+  .state-n{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:2px;}
+  .state-d{font-size:11px;color:var(--dim);}
+
+  /* GIT COMMAND */
+  .gcmd{font-family:var(--mono);font-size:10px;color:var(--cyan);background:var(--s2);border-radius:3px;padding:1px 5px;display:inline-block;margin:1px 0;}
+
+  .footer{margin-top:16px;padding-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);font-family:var(--mono);}
+  .pnum{color:var(--teal);font-weight:700;}
+
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:10px;}h1{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hr">
+    <div>
+      <div class="tn">Topic 07 of 12</div>
+      <h1>Machine Learning Operations (MLOps)</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🐳 Containers — Docker, ECS, ECR, EKS</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g4">
+
+  <div class="c c-t">
+    <div class="ct tl">🐳 Docker & ECR</div>
+    <ul class="cl">
+      <li>Apps packaged in containers → run anywhere, any OS</li>
+      <li>Images built from <strong>Dockerfile</strong> → stored in repos</li>
+      <li><strong>ECR</strong> = AWS container registry (private + public gallery)</li>
+      <li>IAM controls access. Backed by S3.</li>
+      <li>Features: vulnerability scanning, versioning, tags, lifecycle</li>
+    </ul>
+    <div class="tree">
+      <div class="tree-h">SageMaker Container Paths:</div>
+      <div>/opt/ml/input/config/ → hyperparameters.json</div>
+      <div>/opt/ml/input/data/&lt;channel&gt;/ → training data</div>
+      <div>/opt/ml/model/ → output model</div>
+      <div>/opt/ml/code/ → script files</div>
+      <div>/opt/ml/output/ → failure info</div>
+    </div>
+    <div class="ty"><strong>ENV vars:</strong> SAGEMAKER_PROGRAM, SM_MODEL_DIR, SM_CHANNELS, SM_HPS, SM_USER_ARGS. Install: <code>pip install sagemaker-containers</code></div>
+  </div>
+
+  <div class="c c-b">
+    <div class="ct bl">🚢 Amazon ECS</div>
+    <div style="margin-bottom:6px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Two Launch Types:</div>
+      <table class="tbl">
+        <tr><td>EC2 Launch</td><td>You manage EC2. Each instance needs ECS Agent. You pay for EC2.</td></tr>
+        <tr><td>Fargate</td><td><strong>Serverless.</strong> No EC2 to manage. Scale by increasing tasks. Pay for CPU/RAM used.</td></tr>
+      </table>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">IAM Roles:</div>
+    <ul class="cl">
+      <li><strong>EC2 Instance Profile:</strong> ECS agent, CloudWatch logs, ECR pulls, Secrets Manager (EC2 only)</li>
+      <li><strong>ECS Task Role:</strong> Per-task permissions (S3, DynamoDB, etc). Defined in task definition.</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">Load Balancers:</div>
+    <div><span class="tag t-g">ALB</span><span style="font-size:10px;color:var(--dim);">most use cases</span></div>
+    <div style="margin-top:2px;"><span class="tag t-y">NLB</span><span style="font-size:10px;color:var(--dim);">high throughput + PrivateLink</span></div>
+    <div style="margin-top:2px;"><span class="tag t-r">CLB</span><span style="font-size:10px;color:var(--dim);">not recommended</span></div>
+    <div class="ty"><strong>EFS + ECS:</strong> Mount EFS on ECS tasks (EC2 or Fargate). Fargate + EFS = fully serverless. <strong>S3 cannot be mounted as a file system!</strong></div>
+  </div>
+
+  <div class="c c-v">
+    <div class="ct vl">☸️ Amazon EKS</div>
+    <ul class="cl">
+      <li>Managed Kubernetes on AWS</li>
+      <li>Alternative to ECS — same goal, different API</li>
+      <li>Cloud-agnostic (also works on Azure, GCP)</li>
+      <li>Use when: already running Kubernetes on-prem or other cloud</li>
+      <li>Multi-region: one EKS cluster per region</li>
+      <li>CloudWatch Container Insights for logs + metrics</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">Node Types:</div>
+    <table class="tbl">
+      <tr><td>Managed Groups</td><td>AWS creates + manages nodes (EC2). ASG-backed. On-Demand or Spot.</td></tr>
+      <tr><td>Self-Managed</td><td>You create + register nodes. Can use EKS Optimized AMI.</td></tr>
+      <tr><td>Fargate</td><td>No nodes to manage at all.</td></tr>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">Storage (CSI driver):</div>
+    <div><span class="tag t-v">EBS</span><span class="tag t-v">EFS (Fargate OK)</span><span class="tag t-v">FSx for Lustre</span><span class="tag t-v">FSx for NetApp</span></div>
+  </div>
+
+  <div class="c c-g">
+    <div class="ct gr">📦 AWS Batch</div>
+    <ul class="cl">
+      <li>Run batch jobs as <strong>Docker images</strong></li>
+      <li>Dynamic EC2 + Spot provisioning. Serverless.</li>
+      <li>Pay for underlying EC2 only</li>
+      <li>Schedule: CloudWatch Events</li>
+      <li>Orchestrate: Step Functions</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">AWS Batch vs Glue:</div>
+    <table class="tbl">
+      <tr><td>Glue ETL</td><td>Apache Spark focus. Manages resources. Data Catalog integration.</td></tr>
+      <tr><td>AWS Batch</td><td>Any compute job (not just ETL). Must provide Docker image. Resources in your account.</td></tr>
+    </table>
+    <div class="ty"><strong>Rule:</strong> ETL = Glue. Non-ETL compute jobs = AWS Batch.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🏗 Infrastructure as Code — CloudFormation, CDK, CI/CD</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <div class="c c-sky">
+    <div class="ct sk">📋 CloudFormation &amp; CDK</div>
+    <div style="font-size:11px;font-weight:700;color:var(--sky);margin-bottom:4px;">AWS CloudFormation</div>
+    <ul class="cl">
+      <li>Declarative IaC — describe what you want, CF creates it in order</li>
+      <li>JSON/YAML templates. Supports almost all AWS resources.</li>
+      <li>Resources tagged with stack identifier for cost tracking</li>
+      <li>Destroy + recreate infra on the fly (dev cost savings!)</li>
+      <li>Auto-generates architecture diagrams</li>
+      <li>Use <code>AWS::SageMaker::Model</code> for repeatable SageMaker deployments</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--violet);margin-bottom:4px;">AWS CDK (Cloud Development Kit)</div>
+    <ul class="cl">
+      <li>Define infra using: JS/TypeScript, Python, Java, .NET</li>
+      <li>High-level constructs → compiled to CloudFormation (JSON/YAML) via <code>cdk synth</code></li>
+      <li>Deploy infra + application code together</li>
+      <li>Great for: Lambda, Docker containers in ECS/EKS</li>
+    </ul>
+    <table class="tbl" style="margin-top:5px;">
+      <thead><tr><th>CDK</th><th>SAM</th></tr></thead>
+      <tbody>
+        <tr><td>All AWS services</td><td>Serverless-focused</td></tr>
+        <tr><td>Programming language</td><td>JSON/YAML declarative</td></tr>
+        <tr><td>Leverages CloudFormation</td><td>Leverages CloudFormation</td></tr>
+        <tr><td>cdk synth → CloudFormation</td><td>Quick start for Lambda</td></tr>
+      </tbody>
+    </table>
+    <div class="ty"><strong>CDK + SAM:</strong> Run <code>cdk synth</code> first → then <code>sam local invoke -t MyCDKStack.template.json</code> for local testing.</div>
+  </div>
+
+  <div class="c c-orange">
+    <div class="ct or">🔄 CI/CD Tools</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Service</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td>CodeBuild</td><td>Compiles source code, runs tests, produces deploy-ready artifacts. Serverless, pay per build time.</td></tr>
+        <tr><td>CodeDeploy</td><td>Automates deployment to EC2 + on-premises. Hybrid service. Needs CodeDeploy Agent pre-installed.</td></tr>
+        <tr><td>CodePipeline</td><td>Orchestrates full CI/CD pipeline: Code→Build→Test→Deploy. Fully managed. Basis for CI/CD.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">CodePipeline workflow:</div>
+    <div class="pipe">
+      <div class="ps">CodeCommit</div><div class="pa">→</div>
+      <div class="ps">CodeBuild</div><div class="pa">→</div>
+      <div class="ps">CodeDeploy</div><div class="pa">→</div>
+      <div class="ps">Elastic Beanstalk</div>
+    </div>
+    <div style="font-size:11px;color:var(--dim);margin-top:4px;">Integrates with: GitHub, CloudFormation, custom plugins, 3rd-party tools.</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Git Flow vs GitHub Flow:</div>
+    <table class="tbl">
+      <tr><td>Git Flow</td><td>main/develop/feature/release/hotfix branches. Scrum-style. More complex.</td></tr>
+      <tr><td>GitHub Flow</td><td>Only main + feature branches. Deploy immediately on merge. Multiple releases/day. Simpler.</td></tr>
+    </table>
+    <div class="ty"><strong>Key git commands:</strong> <span class="gcmd">git init</span> <span class="gcmd">git clone</span> <span class="gcmd">git add</span> <span class="gcmd">git commit</span> <span class="gcmd">git push</span> <span class="gcmd">git pull</span> <span class="gcmd">git branch</span> <span class="gcmd">git merge</span> <span class="gcmd">git stash</span> <span class="gcmd">git rebase</span> <span class="gcmd">git cherry-pick</span> <span class="gcmd">git revert</span></div>
+  </div>
+
+  <div class="c c-a">
+    <div class="ct am">⚡ Amazon EventBridge &amp; Step Functions</div>
+    <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px;">Amazon EventBridge</div>
+    <ul class="cl">
+      <li>Schedule cron jobs OR react to AWS service events</li>
+      <li>Three bus types: Default (AWS), Partner, Custom</li>
+      <li>Event buses accessible cross-account via resource policies</li>
+      <li>Archive + replay events</li>
+      <li>Schema Registry: auto-infer event schemas, generate code</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">Destinations: Lambda, AWS Batch, ECS Task, SQS, SNS, Kinesis, Step Functions, CodePipeline, CodeBuild, SSM, EC2</div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--violet);margin-bottom:4px;">AWS Step Functions</div>
+    <ul class="cl">
+      <li>Visual workflow designer for complex pipelines</li>
+      <li>Advanced error handling + retry outside of code</li>
+      <li>Audit history of all workflow executions</li>
+      <li><strong>Max execution time: 1 year</strong></li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">State Types:</div>
+    <div><span class="tag t-t">Task</span><span class="tag t-y">Choice</span><span class="tag t-v">Wait</span><span class="tag t-g">Parallel</span><span class="tag t-a">Map ⭐ (for ML!)</span><span class="tag t-b">Pass</span><span class="tag t-gr">Succeed</span><span class="tag t-r">Fail</span></div>
+    <div class="ty"><strong>Map state</strong> = run steps for each item in dataset in parallel. Works with JSON, S3 objects, CSV. Perfect for ML batch processing!</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🌊 Orchestration — MWAA (Airflow) &amp; Lake Formation</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <div class="c c-cyan">
+    <div class="ct cy">🌀 Amazon MWAA (Managed Apache Airflow)</div>
+    <ul class="cl">
+      <li>Managed Apache Airflow — no install/maintenance</li>
+      <li>Workflows defined as Python <strong>DAGs (Directed Acyclic Graphs)</strong></li>
+      <li>DAG files uploaded to S3 → MWAA picks them up</li>
+      <li>Runs in a VPC (at least 2 AZs). Private or public endpoints.</li>
+      <li>IAM-managed access. Automatic scaling of workers.</li>
+      <li><strong>Schedulers + Workers = AWS Fargate containers</strong></li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Integrations:</div>
+    <div><span class="tag t-c">Athena</span><span class="tag t-c">Batch</span><span class="tag t-c">EMR</span><span class="tag t-c">Fargate</span><span class="tag t-c">EKS</span><span class="tag t-c">Kinesis</span><span class="tag t-c">Glue</span><span class="tag t-c">Lambda</span><span class="tag t-c">Redshift</span><span class="tag t-c">SageMaker</span><span class="tag t-c">S3</span><span class="tag t-c">SNS</span><span class="tag t-c">SQS</span></div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Use Cases:</div>
+    <div><span class="tag t-y">Complex ML workflows</span><span class="tag t-y">ETL coordination</span><span class="tag t-y">ML data preparation</span></div>
+    <div class="ty"><strong>MWAA vs Step Functions:</strong> MWAA = Python-defined DAGs for complex batch workflows. Step Functions = visual state machines for event-driven/real-time workflows. Both can orchestrate ML pipelines.</div>
+  </div>
+
+  <div class="c c-lime">
+    <div class="ct lm">🏞 AWS Lake Formation</div>
+    <ul class="cl">
+      <li>"Set up a secure data lake in days"</li>
+      <li>Built on top of <strong>Glue</strong> — everything Glue can do + more</li>
+      <li>Data loading, monitoring flows, partition management</li>
+      <li>Encryption, key management, access control, auditing</li>
+      <li><strong>Lake Formation itself is FREE</strong> — pay for underlying services (Glue, S3, EMR, Athena, Redshift)</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Fine-Grained Security:</div>
+    <table class="tbl">
+      <tr><td>Row-level</td><td>All columns + row filter. Only specific rows visible.</td></tr>
+      <tr><td>Column-level</td><td>All rows + specific columns. Only certain columns visible.</td></tr>
+      <tr><td>Cell-level</td><td>Specific rows + specific columns. Most granular.</td></tr>
+      <tr><td>Policy tags</td><td>Tag-based permissions on databases, tables, columns.</td></tr>
+    </table>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Governed Tables (ACID):</div>
+    <ul class="cl">
+      <li>Supports ACID transactions across multiple tables (new S3 table type)</li>
+      <li>Works with streaming data (Kinesis). Query with Athena.</li>
+      <li>Row and Cell-Level Security for governed + S3 tables</li>
+      <li>Automatic compaction for storage optimization</li>
+    </ul>
+    <div class="ty"><strong>⚡ Cross-account:</strong> Recipient must be data lake admin. Use RAM for external org accounts. IAM permissions needed for KMS keys on encrypted catalogs.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🚀 SageMaker Deployment — Inference Options &amp; Monitoring</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <div class="c c-t">
+    <div class="ct tl">📡 Inference Types</div>
+    <table class="tbl">
+      <thead><tr><th>Type</th><th>Use When</th><th>Key Facts</th></tr></thead>
+      <tbody>
+        <tr><td>Real-time</td><td>Interactive, low latency requirements</td><td>Persistent endpoint. Individual predictions on demand.</td></tr>
+        <tr><td>Serverless</td><td>Idle periods, unpredictable traffic, tolerates cold starts</td><td>Auto-provision, scale to zero. Monitor: ModelSetupTime, Invocations, MemoryUtilization.</td></tr>
+        <tr><td>Async</td><td>Large payloads, long processing (near-real-time OK)</td><td>Queued requests. Payload up to <strong>1 GB</strong>. Queued processing.</td></tr>
+        <tr><td>Batch Transform</td><td>Predictions for entire dataset at once</td><td>Not an endpoint. Process large datasets offline.</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Deployment Methods:</div>
+    <ul class="cl">
+      <li><strong>JumpStart:</strong> Pre-trained models to pre-configured endpoints</li>
+      <li><strong>ModelBuilder (Python SDK):</strong> Configure deployment from code</li>
+      <li><strong>CloudFormation:</strong> <code>AWS::SageMaker::Model</code> for repeatable deployments</li>
+    </ul>
+    <div class="ty"><strong>HA:</strong> SageMaker auto-distributes across AZs — but needs &gt;1 instance. Deploy multiple instances per endpoint. VPC with 2+ subnets in different AZs.</div>
+  </div>
+
+  <div class="c c-v">
+    <div class="ct vl">🔵 Deployment Safeguards</div>
+    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:4px;">Production Variants (A/B Testing):</div>
+    <ul class="cl">
+      <li>Test multiple models on <strong>live traffic</strong> using variant weights</li>
+      <li>e.g., new model at 10% → ramp to 100% when confident</li>
+      <li>Validates in real-world settings (offline validation isn't always useful)</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Blue/Green Deployments (Deployment Guardrails):</div>
+    <div class="deploy-row">
+      <div class="deploy-label" style="color:var(--blue);">All at Once</div>
+      <div style="color:var(--dim);font-size:11px;">Shift all traffic to new model, monitor, terminate old fleet</div>
+    </div>
+    <div class="deploy-row">
+      <div class="deploy-label" style="color:var(--yellow);">Canary</div>
+      <div style="color:var(--dim);font-size:11px;">Shift small % of traffic first. Monitor. Expand if OK.</div>
+    </div>
+    <div class="deploy-row">
+      <div class="deploy-label" style="color:var(--green);">Linear</div>
+      <div style="color:var(--dim);font-size:11px;">Shift traffic in linearly spaced steps. Gradual rollout.</div>
+    </div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Shadow Tests:</div>
+    <ul class="cl">
+      <li>Compare performance of <strong>shadow variant</strong> vs production</li>
+      <li>You monitor in console and decide when to promote</li>
+    </ul>
+    <div class="ty"><strong>Auto-rollbacks:</strong> Deployment Guardrails includes automatic rollback on failure. Always load test your scaling configuration before production!</div>
+  </div>
+
+  <div class="c c-sky">
+    <div class="ct sk">🛠 Inference Pipelines &amp; Tools</div>
+    <div style="font-size:11px;font-weight:700;color:var(--sky);margin-bottom:4px;">Inference Pipelines:</div>
+    <ul class="cl">
+      <li><strong>2–15 containers</strong> in a linear sequence</li>
+      <li>Mix of built-in algorithms + custom Docker containers</li>
+      <li>Pre-processing → Predictions → Post-processing</li>
+      <li>Spark ML + scikit-learn containers supported</li>
+      <li>Spark ML serialized to <strong>MLeap format</strong></li>
+      <li>Supports both real-time + batch transform</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">SageMaker Neo (Edge Deployment):</div>
+    <ul class="cl">
+      <li>Train once, run anywhere (edge devices)</li>
+      <li>ARM, Intel, Nvidia processors — compiles to hardware-optimized code</li>
+      <li>Frameworks: TF, MXNet, PyTorch, ONNX, XGBoost, DarkNet, Keras</li>
+      <li>Deploy to HTTPS endpoint OR IoT Greengrass for actual edge devices</li>
+      <li><strong>Greengrass:</strong> inference at edge with local data, model trained in cloud. Uses Lambda inference apps.</li>
+      <li>Must use <strong>same instance type</strong> for compilation AND hosting</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Inference Recommender:</div>
+    <ul class="cl">
+      <li><strong>Instance Recommendations:</strong> ~45 min. Load tests on recommended instances.</li>
+      <li><strong>Endpoint Recommendations:</strong> ~2 hrs. Custom load test with your traffic patterns.</li>
+    </ul>
+    <div class="ty"><strong>Automatic Scaling:</strong> Set target metrics + min/max capacity + cooldown. Works with CloudWatch. Load test BEFORE using!</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🔁 MLOps Pipelines — SageMaker Projects, Pipelines &amp; Kubeflow</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <div class="c c-pink">
+    <div class="ct pk">🏭 SageMaker Projects &amp; Pipelines</div>
+    <div style="font-size:11px;font-weight:700;color:var(--pink);margin-bottom:4px;">SageMaker Projects (native MLOps CI/CD):</div>
+    <ul class="cl">
+      <li>SageMaker Studio's native MLOps solution</li>
+      <li>End-to-end ML lifecycle: build → prep → train → evaluate → deploy → monitor → update</li>
+      <li>Uses code repositories + SageMaker Pipelines defining steps</li>
+      <li>Supports: images, feature engineering, training, evaluation, deployment, monitoring</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--violet);margin-bottom:4px;">SageMaker Pipelines (workflow automation):</div>
+    <ul class="cl">
+      <li>Define ML workflow steps as a DAG</li>
+      <li>Each step = a SageMaker job (processing, training, evaluation, deployment)</li>
+      <li>Integrates with Model Registry for approval workflows</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">MLOps with Kubernetes:</div>
+    <ul class="cl">
+      <li>SageMaker integrates with Kubeflow Pipelines via SageMaker Components</li>
+      <li>Enables hybrid ML workflows (on-prem + cloud)</li>
+      <li>Integrate existing ML platforms built on Kubernetes/Kubeflow</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">MLOps Workload Orchestrator (Solutions Library):</div>
+    <ul class="cl">
+      <li>CloudFormation templates for MLOps pipelines</li>
+      <li>12 pipelines: training with HPO/Autopilot, BYOM inference, custom Docker, Model Monitor</li>
+    </ul>
+    <div class="ty"><strong>⚡ SageMaker Projects workflow:</strong> Create Model Group → SageMaker Pipeline → Register model versions → Model Registry Collections → Review/Approve → Deploy via CI/CD.</div>
+  </div>
+
+  <div class="c c-red">
+    <div class="ct rd">⚠️ Exam Quick-Fire &amp; Traps</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Critical Facts:</div>
+    <ul class="cl">
+      <li>ECS <strong>Fargate + EFS</strong> = fully serverless container + storage</li>
+      <li><strong>S3 cannot be mounted</strong> as a file system to ECS tasks</li>
+      <li>CDK compiles to CloudFormation via <code>cdk synth</code></li>
+      <li>CloudFormation <code>AWS::SageMaker::Model</code> = repeatable endpoint deployments</li>
+      <li>Step Functions <strong>Map state</strong> = parallel processing per dataset item (key for ML!)</li>
+      <li>Step Functions max execution = <strong>1 year</strong></li>
+      <li>MWAA schedulers/workers run on <strong>Fargate containers</strong></li>
+      <li>Lake Formation = <strong>free</strong> (pay for Glue, S3, EMR, Athena, Redshift)</li>
+      <li>Governed Tables in Lake Formation = ACID + can't change type after creation</li>
+      <li>Neo requires <strong>same instance type</strong> for compilation AND deployment</li>
+      <li>Async inference = max <strong>1 GB</strong> payload size</li>
+      <li>SageMaker HA = needs &gt;1 instance + VPC with 2+ subnets in different AZs</li>
+      <li>Inference Pipeline = <strong>2–15 containers</strong>. Spark ML → MLeap format.</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--red);margin-bottom:5px;">Common Exam Traps:</div>
+    <ul class="cl">
+      <li>ECS <strong>EC2 Instance Profile</strong> ≠ ECS <strong>Task Role</strong> — different purposes, different scope</li>
+      <li>ALB = ECS standard. NLB = high throughput/PrivateLink. CLB = deprecated.</li>
+      <li>AWS Batch = any Docker job. Glue = ETL specifically. Don't swap them.</li>
+      <li>GitHub Flow = only 2 branch types (main + feature). Git Flow = 5 branch types.</li>
+      <li>Lake Formation cross-account: recipient must be <strong>data lake admin</strong> AND need RAM for external orgs</li>
+      <li>EKS vs ECS: EKS = Kubernetes (cloud-agnostic). ECS = AWS-native. Similar goal, different API.</li>
+      <li>Serverless Inference = tolerates <strong>cold starts</strong>. Not suitable for consistent low-latency.</li>
+      <li>Blue/Green = Canary ≠ Linear ≠ All at Once — know the differences!</li>
+      <li>Production Variants = A/B testing on <strong>live traffic</strong>. Shadow Tests = shadow variant performance comparison.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 07: Machine Learning Operations (MLOps)</span>
+  <span class="pnum">7 / 12</span>
+</div>
+
+</body>
+</html>

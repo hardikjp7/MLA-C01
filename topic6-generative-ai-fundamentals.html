@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 6: Generative AI Model Fundamentals</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&display=swap');
+  :root {
+    --bg:#060910;--s1:#0b0e1a;--s2:#10142a;--bd:#181e38;
+    --gold:#f59e0b;--pink:#f472b6;--blue:#60a5fa;--violet:#a78bfa;
+    --teal:#2dd4bf;--green:#4ade80;--red:#f87171;--orange:#fb923c;
+    --sky:#7dd3fc;--lime:#a3e635;--rose:#fb7185;
+    --text:#dce8ff;--dim:#4a5a80;
+    --mono:'JetBrains Mono',monospace;--sans:'Nunito',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12.5px;line-height:1.5;padding:18px;}
+
+  .hdr{background:linear-gradient(135deg,#060910,#0e1030,#060910);border:1px solid var(--gold);border-radius:12px;padding:18px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .hdr::after{content:'✦';position:absolute;right:30px;top:15px;font-size:60px;color:rgba(245,158,11,0.06);pointer-events:none;}
+  .hr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+  .tn{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;}
+  h1{font-size:22px;font-weight:900;background:linear-gradient(90deg,var(--gold),var(--orange),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:4px 0 2px;}
+  .sub{color:var(--dim);font-size:11px;}
+  .bdg{background:var(--gold);color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px;}
+
+  .sec{font-family:var(--mono);font-size:10px;color:var(--violet);text-transform:uppercase;letter-spacing:3px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+  .full{margin-bottom:10px;}
+
+  .c{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:11px;}
+  .c-gold{border-top:3px solid var(--gold);}  .c-pink{border-top:3px solid var(--pink);}
+  .c-blue{border-top:3px solid var(--blue);}  .c-v{border-top:3px solid var(--violet);}
+  .c-t{border-top:3px solid var(--teal);}      .c-g{border-top:3px solid var(--green);}
+  .c-r{border-top:3px solid var(--red);}       .c-o{border-top:3px solid var(--orange);}
+  .c-sky{border-top:3px solid var(--sky);}     .c-lime{border-top:3px solid var(--lime);}
+  .c-rose{border-top:3px solid var(--rose);}
+
+  .ct{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+  .gold{color:var(--gold);}.pink{color:var(--pink);}.blue{color:var(--blue);}.vio{color:var(--violet);}
+  .teal{color:var(--teal);}.grn{color:var(--green);}.red{color:var(--red);}.ora{color:var(--orange);}
+  .sky{color:var(--sky);}.lime{color:var(--lime);}.rose{color:var(--rose);}
+
+  ul.cl{list-style:none;}
+  ul.cl li{padding:2px 0 2px 13px;position:relative;color:var(--dim);font-size:11.5px;}
+  ul.cl li::before{content:'▸';position:absolute;left:0;color:var(--gold);font-size:9px;top:5px;}
+  ul.cl li strong{color:var(--text);}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;}
+  .t-g{background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.2);}
+  .t-p{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.2);}
+  .t-b{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+  .t-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.2);}
+  .t-t{background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
+  .t-gr{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);}
+  .t-r{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+  .t-o{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2);}
+  .t-sky{background:rgba(125,211,252,.1);color:var(--sky);border:1px solid rgba(125,211,252,.2);}
+
+  .ty{background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-left:3px solid var(--gold);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .ty strong{color:var(--gold);}
+  .tr{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-left:3px solid var(--red);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tr strong{color:var(--red);}
+  .tg{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-left:3px solid var(--green);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tg strong{color:var(--green);}
+  .tv{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.15);border-left:3px solid var(--violet);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tv strong{color:var(--violet);}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--s2);padding:5px 8px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--bd);}
+  .tbl td{padding:5px 8px;border-bottom:1px solid rgba(24,30,56,.6);color:var(--dim);vertical-align:top;}
+  .tbl td:first-child{color:var(--text);font-weight:700;}
+  .tbl tr:last-child td{border-bottom:none;}
+
+  /* FLOW DIAGRAM */
+  .flow{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:5px 0;}
+  .fstep{background:var(--s2);border:1px solid var(--bd);border-radius:5px;padding:4px 9px;font-size:10px;color:var(--text);font-weight:700;}
+  .farr{color:var(--gold);font-size:14px;font-weight:900;}
+
+  /* ATTENTION DIAGRAM */
+  .att-row{display:grid;grid-template-columns:60px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid rgba(24,30,56,.5);font-size:11px;align-items:start;}
+  .att-row:last-child{border-bottom:none;}
+  .att-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--gold);}
+
+  /* MODEL CARDS */
+  .model-card{background:var(--s2);border-radius:6px;padding:8px 10px;margin-bottom:5px;}
+  .model-name{font-family:var(--mono);font-size:11px;font-weight:700;margin-bottom:3px;}
+  .model-desc{font-size:11px;color:var(--dim);}
+
+  /* TERM GRID */
+  .term-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
+  .term-box{background:var(--s2);border-radius:5px;padding:7px;}
+  .term-name{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:2px;}
+  .term-def{font-size:10px;color:var(--dim);}
+
+  /* COMPARE TABLE */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  .vs-col{padding:0 8px;}
+  .vs-col:first-child{border-right:1px solid var(--bd);padding-left:0;}
+  .vs-title{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid var(--bd);}
+  .vs-item{font-size:11px;color:var(--dim);padding:2px 0;}
+  .vs-item::before{content:'• ';color:var(--gold);}
+
+  .footer{margin-top:16px;padding-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);font-family:var(--mono);}
+  .pnum{color:var(--gold);font-weight:700;}
+
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:10px;}h1{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hr">
+    <div>
+      <div class="tn">Topic 06 of 12</div>
+      <h1>Generative AI Model Fundamentals</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🔄 The Transformer Architecture — Evolution & Self-Attention</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Evolution -->
+  <div class="c c-gold">
+    <div class="ct gold">📈 Evolution to Transformers</div>
+    <div class="flow" style="margin-bottom:8px;">
+      <div class="fstep">RNN / LSTM</div><div class="farr">→</div>
+      <div class="fstep">Attention (RNN)</div><div class="farr">→</div>
+      <div class="fstep">Transformer</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Why RNNs weren't enough:</div>
+    <ul class="cl">
+      <li>Sequential nature — <strong>can't parallelize</strong></li>
+      <li>Information bottleneck (encoder→decoder via 1 vector)</li>
+      <li>Early tokens "forgotten" in long sequences</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Attention with RNNs (improvement):</div>
+    <ul class="cl">
+      <li>Hidden state per token (not just final state)</li>
+      <li>Better word order handling</li>
+      <li>Still sequential — still can't parallelize</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Transformers (the breakthrough):</div>
+    <ul class="cl">
+      <li>Ditch RNNs — use <strong>Feed-Forward Neural Networks (FFNNs)</strong></li>
+      <li>Use <strong>self-attention</strong> — processes entire input at once</li>
+      <li>Fully <strong>parallelizable</strong> → train on vastly more data</li>
+    </ul>
+    <div class="ty"><strong>Paper:</strong> "Attention is All You Need" (2017) — the seminal transformer paper. Killed the need for RNNs in sequence modeling.</div>
+  </div>
+
+  <!-- Self-Attention Mechanism -->
+  <div class="c c-violet">
+    <div class="ct vio">🎯 Self-Attention Step by Step</div>
+    <div class="att-row">
+      <div class="att-label">Step 1</div>
+      <div style="color:var(--dim);font-size:11px;">Each token gets embedding vector. Three weight matrices learned via backprop: <strong>Wq (Query), Wk (Key), Wv (Value)</strong></div>
+    </div>
+    <div class="att-row">
+      <div class="att-label">Step 2</div>
+      <div style="color:var(--dim);font-size:11px;">Multiply each token embedding by Wq→q, Wk→k, Wv→v vectors.</div>
+    </div>
+    <div class="att-row">
+      <div class="att-label">Step 3</div>
+      <div style="color:var(--dim);font-size:11px;"><strong>Scaled dot-product attention:</strong> compute score = dot(q, each k). Apply softmax to normalize scores into percentages.</div>
+    </div>
+    <div class="att-row">
+      <div class="att-label">Step 4</div>
+      <div style="color:var(--dim);font-size:11px;">Multiply each value (v) by its softmax score. Sum all results → updated embedding (z) for each token.</div>
+    </div>
+    <div class="att-row">
+      <div class="att-label">Step 5</div>
+      <div style="color:var(--dim);font-size:11px;">Pass updated embeddings into FFNN layer. <strong>All tokens processed in parallel.</strong></div>
+    </div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Multi-Headed Self-Attention:</div>
+    <ul class="cl">
+      <li>Q, K, V vectors reshaped into matrices</li>
+      <li>Each row = one "head" → processed in parallel</li>
+      <li>More heads = richer contextual understanding</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Masked Self-Attention (GPT):</div>
+    <ul class="cl">
+      <li>Prevents tokens from "peeking" at future tokens</li>
+      <li>BERT uses different approach: masked language modeling (predict masked tokens)</li>
+    </ul>
+    <div class="ty"><strong>⚡ Exam:</strong> Q = what am I looking for? K = what do I contain? V = what do I actually say? Softmax normalizes scores to attention weights.</div>
+  </div>
+
+  <!-- Transformer Architecture Models -->
+  <div class="c c-pink">
+    <div class="ct pink">🏗 Transformer Architectures</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Model</th><th>Architecture</th><th>Training</th><th>Key Feature</th></tr></thead>
+      <tbody>
+        <tr><td>GPT</td><td>Decoder-only</td><td>Next token prediction (causal)</td><td>Masked self-attention. Generates text token by token.</td></tr>
+        <tr><td>BERT</td><td>Encoder-only</td><td>Masked language modeling</td><td>Bidirectional context. Pre-trained on BookCorpus + Wikipedia.</td></tr>
+        <tr><td>T5</td><td>Encoder + Decoder</td><td>Text-to-text tasks</td><td>Everything as text-to-text task.</td></tr>
+        <tr><td>DistilBERT</td><td>Encoder-only</td><td>Knowledge distillation</td><td>40% smaller than BERT, ~97% performance.</td></tr>
+        <tr><td>RoBERTa</td><td>Encoder-only</td><td>More robust BERT training</td><td>Better training procedure than BERT.</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Applications of Transformers:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:3px;">
+      <span class="tag t-p">Chat</span><span class="tag t-p">Q&A</span><span class="tag t-p">Text Classification</span>
+      <span class="tag t-p">Sentiment Analysis</span><span class="tag t-p">NER</span><span class="tag t-p">Summarization</span>
+      <span class="tag t-p">Translation</span><span class="tag t-p">Code Generation</span><span class="tag t-p">Text Generation</span>
+    </div>
+    <div class="ty"><strong>⚡ Key distinction:</strong> GPT = decoder-only (generates). BERT = encoder-only (understands). T5 = both (translates/transforms). DistilBERT = knowledge distillation (NOT simple compression).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🤖 LLM Fundamentals — How GPT Works & Key Terms</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <!-- GPT Architecture + LLM Pipeline -->
+  <div class="c c-blue">
+    <div class="ct blue">⚙️ GPT Architecture &amp; LLM Pipeline</div>
+    <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:5px;">GPT Architecture:</div>
+    <ul class="cl">
+      <li>Decoder-only — stacks of decoder blocks</li>
+      <li>Each block: <strong>masked self-attention layer + FFNN</strong></li>
+      <li>No concept of input/output — just generates next token repeatedly</li>
+      <li>Trained on unlabeled text (no labels needed!)</li>
+      <li>Hundreds of billions of parameters</li>
+      <li>Prompted with tokens → keeps generating based on previous tokens</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Input Processing Pipeline:</div>
+    <div class="flow">
+      <div class="fstep">Text Input</div><div class="farr">→</div>
+      <div class="fstep">Tokenization</div><div class="farr">→</div>
+      <div class="fstep">Token Embedding</div><div class="farr">→</div>
+      <div class="fstep">Positional Encoding</div><div class="farr">→</div>
+      <div class="fstep">Decoder Blocks</div>
+    </div>
+    <ul class="cl" style="margin-top:5px;">
+      <li><strong>Tokenization:</strong> Text → numerical token IDs (words or sub-words)</li>
+      <li><strong>Token Embedding:</strong> IDs → vectors that capture semantic meaning</li>
+      <li><strong>Positional Encoding:</strong> Adds position info using sinusoidal function (works for any length)</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Output Processing:</div>
+    <ul class="cl">
+      <li>Decoder outputs a vector → multiply by token embeddings</li>
+      <li>Get probabilities (logits) for each possible next token</li>
+      <li>Select next token (deterministic or randomized via temperature)</li>
+      <li>Repeat until end token or max length reached</li>
+    </ul>
+    <div class="ty"><strong>⚡ Why no labels?</strong> GPT learns by predicting the next word in existing text — the "labels" are the next words in the training corpus itself. Self-supervised learning.</div>
+  </div>
+
+  <!-- LLM Key Terms -->
+  <div class="c c-teal">
+    <div class="ct teal">📚 LLM Key Terms (Exam Must-Know)</div>
+    <div class="term-grid">
+      <div class="term-box">
+        <div class="term-name" style="color:var(--teal);">Tokens</div>
+        <div class="term-def">Numerical representations of words or parts of words. LLMs think in tokens, not characters.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--blue);">Embeddings</div>
+        <div class="term-def">Mathematical vector representations encoding token "meaning". Similar tokens → nearby vectors in high-dimensional space.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--gold);">Temperature 🌡</div>
+        <div class="term-def"><strong>High</strong> = more random/creative output. <strong>Low</strong> = more deterministic/consistent output. Controls randomness in token selection.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--violet);">Top P</div>
+        <div class="term-def">Threshold probability for token inclusion. Higher = more random. Nucleus sampling — selects from smallest set of tokens whose cumulative probability ≥ P.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--pink);">Top K</div>
+        <div class="term-def">Alternate to Top P. K candidates considered for next token. Higher K = more random. Simpler than Top P.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--orange);">Context Window</div>
+        <div class="term-def">Max number of tokens the LLM can process at once (input + output combined). Limits how much "memory" the model has during a conversation.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--green);">Max Tokens</div>
+        <div class="term-def">Hard limit for total tokens on input or output. Different from context window in some implementations.</div>
+      </div>
+      <div class="term-box">
+        <div class="term-name" style="color:var(--red);">Hallucination</div>
+        <div class="term-def">When LLM generates plausible-sounding but factually incorrect information. Key challenge in production GenAI systems.</div>
+      </div>
+    </div>
+    <div class="ty"><strong>⚡ Temperature vs Top P vs Top K:</strong> All control randomness of output. Temperature = overall randomness. Top P = probability threshold. Top K = candidate count. Higher value = more random for all three.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🌐 Foundation Models &amp; AWS Ecosystem</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Foundation Models -->
+  <div class="c c-gold">
+    <div class="ct gold">🏛 Foundation Models</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">Giant pre-trained transformer models. Fine-tune for specific tasks or use for new applications.</div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--gold);">Amazon Titan</div>
+      <div class="model-desc">Text summarization, generation, Q&A, <strong>Embeddings</strong>, personalization, search. Titan models approve immediately.</div>
+    </div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--blue);">Claude (Anthropic)</div>
+      <div class="model-desc">Conversations, Q&A, workflow automation. (That's us! 🙂)</div>
+    </div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--violet);">Llama (Meta)</div>
+      <div class="model-desc">Open-source LLM. Available via Bedrock.</div>
+    </div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--pink);">Stable Diffusion (stability.ai)</div>
+      <div class="model-desc">Image, art, logo, design generation.</div>
+    </div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--orange);">Jurassic-2 (AI21 Labs)</div>
+      <div class="model-desc">Multilingual LLMs. Spanish, French, German, Portuguese, Italian, Dutch.</div>
+    </div>
+    <div class="model-card">
+      <div class="model-name" style="color:var(--teal);">Cohere</div>
+      <div class="model-desc">Text generation + Embeddings (used for Knowledge Bases in Bedrock).</div>
+    </div>
+    <div class="ty"><strong>⚡ SageMaker JumpStart:</strong> Quick-start notebooks with pre-loaded foundation models. Hugging Face (Falcon, Flan, BloomZ, GPT-J), Stable Diffusion, Amazon Alexa (multilingual encoder/decoder).</div>
+  </div>
+
+  <!-- Fine-tuning vs RAG vs Pretraining -->
+  <div class="c c-violet">
+    <div class="ct vio">🔧 Adapting Foundation Models</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Method</th><th>Data Needed</th><th>Cost</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Use As-Is</td><td>None</td><td>Lowest</td><td>General tasks the model already handles</td></tr>
+        <tr><td>Prompt Engineering</td><td>None (just prompts)</td><td>Very Low</td><td>Quick iteration, specific task formatting</td></tr>
+        <tr><td>RAG</td><td>Your documents/data</td><td>Low-Med</td><td>Current data, proprietary info, reducing hallucinations</td></tr>
+        <tr><td>Fine-tuning</td><td>Labeled prompt→completion pairs</td><td>Medium-High</td><td>Custom style/personality, domain-specific tasks</td></tr>
+        <tr><td>Continued Pre-training</td><td>Unlabeled text</td><td>High</td><td>Familiarize model with domain docs</td></tr>
+        <tr><td>Train from Scratch</td><td>Massive dataset</td><td>Very High</td><td>Unique domain, fundamentally different data</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Fine-tuning in Bedrock (Custom Models):</div>
+    <ul class="cl">
+      <li>Models: <strong>Titan, Cohere, Meta (Llama)</strong></li>
+      <li>Text models: prompt→completion pairs in S3</li>
+      <li>Image models: S3 paths to image descriptions</li>
+      <li>Use <strong>VPC + PrivateLink</strong> for sensitive training data</li>
+      <li>Can fine-tune a fine-tuned model (iterative improvement)</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:7px;margin-bottom:4px;">Continued Pre-training:</div>
+    <ul class="cl">
+      <li>Like fine-tuning but with <strong>unlabeled data</strong></li>
+      <li>Format: <code>{"input": "text here"}</code></li>
+      <li>Embeds knowledge INTO the model — no need for prompt context</li>
+    </ul>
+    <div class="ty"><strong>⚡ Fine-tuning vs RAG:</strong> Fine-tuning = bakes knowledge into model weights (expensive, permanent). RAG = retrieves at query time (cheap, updatable, can still hallucinate).</div>
+  </div>
+
+  <!-- Amazon Bedrock Core -->
+  <div class="c c-orange">
+    <div class="ct ora">🧱 Amazon Bedrock Core</div>
+    <ul class="cl">
+      <li>Serverless API for GenAI foundation models</li>
+      <li>Invoke chat, text, or image models</li>
+      <li>Must use IAM user (<strong>NOT root</strong>)</li>
+      <li>Permissions: <code>AmazonBedrockFullAccess</code> or <code>AmazonBedrockReadOnly</code></li>
+      <li>Must <strong>request model access</strong> before using any base model</li>
+      <li>Titan = immediate approval. 3rd-party = may need extra info.</li>
+      <li>3rd-party billed through AWS at their rates</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">API Endpoints:</div>
+    <table class="tbl">
+      <tr><td>bedrock</td><td>Manage + deploy models</td></tr>
+      <tr><td>bedrock-runtime</td><td>Run inference. Methods: <code>Converse</code>, <code>InvokeModel</code>, <code>InvokeModelWithResponseStream</code></td></tr>
+      <tr><td>bedrock-agent</td><td>Manage agents + knowledge bases</td></tr>
+      <tr><td>bedrock-agent-runtime</td><td>Run agent inference. Methods: <code>InvokeAgent</code>, <code>Retrieve</code>, <code>RetrieveAndGenerate</code></td></tr>
+    </table>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Extra Features:</div>
+    <ul class="cl">
+      <li><strong>Imported models:</strong> import from S3 or SageMaker</li>
+      <li><strong>Model evaluation:</strong> auto (accuracy, toxicity, BERTScore, F1) or human review</li>
+      <li><strong>Watermark detection:</strong> detects if image was generated by Titan</li>
+      <li><strong>Bedrock Studio:</strong> web workspace without AWS accounts. Uses SSO + IdP.</li>
+      <li><strong>Provisioned throughput:</strong> purchase increased token rate for your model/agent</li>
+    </ul>
+    <div class="ty"><strong>⚡ Exam:</strong> Must request access before using ANY base model. Bedrock is serverless. IAM user required (not root). 3rd party models billed through AWS at their own rates.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">📖 RAG — Retrieval Augmented Generation</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <!-- RAG Concept + Pros/Cons -->
+  <div class="c c-green">
+    <div class="ct grn">🔍 RAG — Concept &amp; Tradeoffs</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:7px;">Like an <strong>open-book exam for LLMs</strong> — query external data and inject it into the prompt context rather than relying on model training alone.</div>
+    <div class="flow" style="margin-bottom:8px;">
+      <div class="fstep">User Query</div><div class="farr">→</div>
+      <div class="fstep">Embed Query</div><div class="farr">→</div>
+      <div class="fstep">Search Vector DB</div><div class="farr">→</div>
+      <div class="fstep">Retrieve Top-N</div><div class="farr">→</div>
+      <div class="fstep">Augment Prompt</div><div class="farr">→</div>
+      <div class="fstep">LLM Response</div>
+    </div>
+    <div class="vs">
+      <div class="vs-col">
+        <div class="vs-title" style="color:var(--green);">✅ Pros</div>
+        <div class="vs-item">Faster &amp; cheaper than fine-tuning</div>
+        <div class="vs-item">Easy to update (just update DB)</div>
+        <div class="vs-item">Semantic search via vector stores</div>
+        <div class="vs-item">Reduces hallucinations</div>
+        <div class="vs-item">Proprietary info stays in your DB</div>
+        <div class="vs-item">No model retraining needed</div>
+      </div>
+      <div class="vs-col">
+        <div class="vs-title" style="color:var(--red);">❌ Cons</div>
+        <div class="vs-item">Overcomplicated search engine</div>
+        <div class="vs-item">Sensitive to prompt templates</div>
+        <div class="vs-item">Non-deterministic output</div>
+        <div class="vs-item">Can still hallucinate</div>
+        <div class="vs-item">Depends on retrieval quality</div>
+        <div class="vs-item">NOT model training</div>
+      </div>
+    </div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Embeddings &amp; Vector Search:</div>
+    <ul class="cl">
+      <li>Embedding = high-dimensional vector (100s-1000s of dimensions)</li>
+      <li>Similar items → close vectors in embedding space</li>
+      <li>Vector search = K-Nearest Neighbor on embeddings</li>
+      <li>Embedding models: <strong>Amazon Titan, Cohere</strong></li>
+    </ul>
+    <div class="ty"><strong>Vector DB options:</strong> Commercial: Pinecone, Weaviate. Open source: Chroma, Qdrant, Milvus, LanceDB. Existing DB with vector: OpenSearch, Elasticsearch, Redis, MongoDB, Cassandra, Neptune.</div>
+  </div>
+
+  <!-- Bedrock Knowledge Bases -->
+  <div class="c c-sky">
+    <div class="ct sky">🗄 Bedrock Knowledge Bases</div>
+    <ul class="cl">
+      <li>Automatic <strong>"Chat with your document"</strong> — managed RAG</li>
+      <li>Upload documents via S3 (with optional JSON schema)</li>
+      <li>Other sources: web crawler, Confluence, Salesforce, SharePoint</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Configuration Options:</div>
+    <table class="tbl">
+      <thead><tr><th>Component</th><th>Options</th></tr></thead>
+      <tbody>
+        <tr><td>Embedding Model</td><td>Amazon Titan or Cohere (must have model access)</td></tr>
+        <tr><td>Vector Store</td><td>OpenSearch Serverless (default for dev), MemoryDB, Aurora, MongoDB Atlas, Pinecone, Redis Enterprise Cloud</td></tr>
+        <tr><td>Chunking</td><td>Controls how many tokens per vector chunk. Affects retrieval granularity.</td></tr>
+        <tr><td>Vector Dimension</td><td>Configurable. Affects precision and storage.</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Knowledge Base Use Cases:</div>
+    <ul class="cl">
+      <li><strong>"Chat with your document":</strong> Direct integration via <code>RetrieveAndGenerate</code></li>
+      <li><strong>In-app RAG:</strong> Use <code>Retrieve</code> API, handle augmentation yourself</li>
+      <li><strong>Agentic RAG:</strong> Knowledge Base as a tool inside an agent</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Bedrock Guardrails:</div>
+    <ul class="cl">
+      <li>Content filtering for prompts AND responses</li>
+      <li>Word filtering, topic filtering, profanity filter</li>
+      <li>PII removal or masking</li>
+      <li><strong>Contextual Grounding Check:</strong> measures grounding (response similarity to context) + relevance (response to query). Prevents hallucination.</li>
+      <li>Can embed into agents and knowledge bases</li>
+      <li>Configure custom "blocked message" response</li>
+    </ul>
+    <div class="tv"><strong>⚡ Guardrails vs Admin Controls (Q Business):</strong> Guardrails = Bedrock-level content filtering. Admin Controls = Q Business employee access restrictions. Different services, different purposes.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🤖 LLM Agents</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+  <div class="c c-pink">
+    <div class="ct pink">🕹 Agent Architecture &amp; Components</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:7px;">LLM agents = LLMs given <strong>tools</strong> to interact with the outside world. The LLM decides which tools to use and when.</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Conceptual Components:</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <tr><td>Memory</td><td>Chat history + external data stores. Not persistent between sessions by default.</td></tr>
+      <tr><td>Planning Module</td><td>Guidance (prompts) on how to break user requests into sub-tasks.</td></tr>
+      <tr><td>Tools Core</td><td>Functions/APIs the agent can call. In Bedrock = Lambda functions.</td></tr>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Bedrock Agent = Action Groups + Knowledge Bases:</div>
+    <ul class="cl">
+      <li><strong>Action Groups:</strong> define tools (Lambda functions) + prompts for when to use them</li>
+      <li>Must define tool parameters (name, description, type, required?)</li>
+      <li><strong>Description is critical</strong> — LLM uses it to extract params from user prompt</li>
+      <li>Agent can ask user for missing parameters interactively</li>
+      <li><strong>Knowledge Bases:</strong> RAG as just another agent tool ("Agentic RAG")</li>
+      <li><strong>Code Interpreter:</strong> optional — agent writes its own code for charts/computation</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:7px;margin-bottom:5px;">Deploying Bedrock Agents:</div>
+    <ul class="cl">
+      <li>Create an <strong>"alias"</strong> → creates deployed snapshot</li>
+      <li><strong>On-Demand Throughput (ODT):</strong> runs at account quota limits</li>
+      <li><strong>Provisioned Throughput (PT):</strong> purchase higher token rate</li>
+      <li>Application calls <code>InvokeAgent</code> with alias ID</li>
+    </ul>
+    <div class="ty"><strong>⚡ Exam:</strong> Tools = Lambda functions. Alias = deployed version. Description parameter matters for LLM tool routing. Agentic RAG = Knowledge Base as a tool. Code Interpreter = optional feature for charts/code.</div>
+  </div>
+
+  <!-- Exam Quick-Fire -->
+  <div class="c c-rose">
+    <div class="ct rose">⚡ Exam Quick-Fire &amp; Traps</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Critical Facts:</div>
+    <ul class="cl">
+      <li>Transformer = parallelizable (RNNs are not)</li>
+      <li>Self-attention: Q×K = attention scores → softmax → weight V vectors → sum</li>
+      <li>GPT = decoder-only. BERT = encoder-only. T5 = both.</li>
+      <li>DistilBERT = 40% smaller via <strong>knowledge distillation</strong></li>
+      <li>Positional encoding uses <strong>sinusoidal function</strong> → works on any sequence length</li>
+      <li>Bedrock requires <strong>model access request</strong> before use</li>
+      <li>Fine-tuning in Bedrock = Titan, Cohere, Meta (Llama) only</li>
+      <li>Continued Pre-training = unlabeled data (not prompt→completion pairs)</li>
+      <li>Knowledge Base default vector store = <strong>OpenSearch Serverless</strong></li>
+      <li>Guardrail Contextual Grounding = measures grounding + relevance</li>
+      <li>Bedrock agents use Lambda for tools + alias for deployment</li>
+      <li>Temperature HIGH = more random. Temperature LOW = more consistent.</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--red);margin-bottom:5px;">Common Exam Traps:</div>
+    <ul class="cl">
+      <li>RAG does <strong>NOT</strong> train the model — it retrieves at query time</li>
+      <li>RAG <strong>can still hallucinate</strong> — it just hallucinates less</li>
+      <li>Bedrock agents tool descriptions are used by the LLM — <strong>description quality matters</strong></li>
+      <li>Fine-tuning in Bedrock = Titan/Cohere/Meta ONLY — not Claude</li>
+      <li>Must be IAM user, <strong>NOT root</strong> for Bedrock</li>
+      <li>Watermark detection works for <strong>Titan-generated images only</strong></li>
+      <li>Bedrock Studio requires <strong>SSO + IdP</strong> — not just IAM users</li>
+      <li>Continued Pre-training ≠ Fine-tuning. Different data formats.</li>
+      <li>Knowledge Base chunking controls retrieval granularity — wrong chunk size = poor retrieval</li>
+      <li>Provisioned Throughput = purchase higher token rate. On-Demand = account quota limits.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 06: Generative AI Model Fundamentals</span>
+  <span class="pnum">6 / 12</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topics 10–12: ML Best Practices + Exam Prep</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+  :root {
+    --bg:#060a08;--s1:#0c120e;--s2:#101a12;--bd:#182018;
+    --green:#22c55e;--teal:#14b8a6;--blue:#60a5fa;--violet:#a78bfa;
+    --yellow:#fbbf24;--orange:#fb923c;--pink:#f472b6;--red:#f87171;
+    --lime:#84cc16;--sky:#38bdf8;--amber:#f59e0b;--cyan:#22d3ee;
+    --text:#d8f0dc;--dim:#3d6045;
+    --mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12px;line-height:1.5;padding:18px;}
+
+  .hdr{background:linear-gradient(135deg,#060a08,#0a1a0c,#060a08);border:1px solid var(--green);border-radius:12px;padding:18px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .hdr::after{content:'🎓';position:absolute;right:25px;top:10px;font-size:70px;opacity:.08;pointer-events:none;}
+  .hr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+  .tn{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:2px;text-transform:uppercase;}
+  h1{font-size:21px;font-weight:800;background:linear-gradient(90deg,var(--green),var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:4px 0 2px;}
+  .sub{color:var(--dim);font-size:11px;}
+  .bdg{background:var(--green);color:#000;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px;}
+
+  .sec{font-family:var(--mono);font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:3px;margin:13px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+  .full{margin-bottom:10px;}
+
+  .c{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:11px;}
+  .c-g{border-top:3px solid var(--green);}.c-t{border-top:3px solid var(--teal);}
+  .c-b{border-top:3px solid var(--blue);}.c-v{border-top:3px solid var(--violet);}
+  .c-y{border-top:3px solid var(--yellow);}.c-o{border-top:3px solid var(--orange);}
+  .c-p{border-top:3px solid var(--pink);}.c-r{border-top:3px solid var(--red);}
+  .c-l{border-top:3px solid var(--lime);}.c-sky{border-top:3px solid var(--sky);}
+  .c-a{border-top:3px solid var(--amber);}.c-c{border-top:3px solid var(--cyan);}
+
+  .ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+  .gr{color:var(--green);}.tl{color:var(--teal);}.bl{color:var(--blue);}.vl{color:var(--violet);}
+  .yl{color:var(--yellow);}.or{color:var(--orange);}.pk{color:var(--pink);}.rd{color:var(--red);}
+  .lm{color:var(--lime);}.sk{color:var(--sky);}.am{color:var(--amber);}.cy{color:var(--cyan);}
+
+  ul.cl{list-style:none;}
+  ul.cl li{padding:2px 0 2px 13px;position:relative;color:var(--dim);font-size:11.5px;}
+  ul.cl li::before{content:'▸';position:absolute;left:0;color:var(--green);font-size:9px;top:5px;}
+  ul.cl li strong{color:var(--text);}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;}
+  .t-g{background:rgba(34,197,94,.1);color:var(--green);border:1px solid rgba(34,197,94,.2);}
+  .t-t{background:rgba(20,184,166,.1);color:var(--teal);border:1px solid rgba(20,184,166,.2);}
+  .t-b{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+  .t-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.2);}
+  .t-y{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2);}
+  .t-o{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2);}
+  .t-r{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+  .t-p{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.2);}
+  .t-a{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+  .t-c{background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.2);}
+  .t-l{background:rgba(132,204,22,.1);color:var(--lime);border:1px solid rgba(132,204,22,.2);}
+
+  .ty{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--yellow);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .ty strong{color:var(--yellow);}
+  .tr{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-left:3px solid var(--red);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tr strong{color:var(--red);}
+  .tg{background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.15);border-left:3px solid var(--green);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tg strong{color:var(--green);}
+  .tt{background:rgba(20,184,166,.05);border:1px solid rgba(20,184,166,.15);border-left:3px solid var(--teal);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tt strong{color:var(--teal);}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--s2);padding:5px 7px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--bd);}
+  .tbl td{padding:5px 7px;border-bottom:1px solid rgba(24,32,24,.6);color:var(--dim);vertical-align:top;}
+  .tbl td:first-child{color:var(--text);font-weight:600;}
+  .tbl tr:last-child td{border-bottom:none;}
+
+  /* lifecycle phase */
+  .phase{background:var(--s2);border-radius:7px;padding:8px 10px;margin-bottom:6px;}
+  .phase-title{font-size:11px;font-weight:700;margin-bottom:4px;}
+  .phase-body{font-size:11px;color:var(--dim);}
+
+  /* responsible AI pill */
+  .ai-dim{display:inline-block;background:var(--s2);border:1px solid var(--bd);border-radius:5px;padding:3px 8px;font-size:10px;margin:2px;}
+
+  /* exam box */
+  .exam-stat{background:var(--s2);border-radius:6px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+  .exam-label{font-size:11px;color:var(--dim);}
+  .exam-val{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--green);}
+
+  /* question type */
+  .qtype{background:var(--s2);border-left:3px solid var(--green);border-radius:5px;padding:6px 10px;margin-bottom:5px;}
+  .qtype-name{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);margin-bottom:2px;}
+  .qtype-desc{font-size:11px;color:var(--dim);}
+
+  /* mega reference grid */
+  .ref-item{background:var(--s2);border-radius:5px;padding:6px 8px;margin-bottom:4px;}
+  .ref-task{font-size:10px;font-weight:700;color:var(--text);margin-bottom:2px;}
+  .ref-tools{font-size:10px;color:var(--dim);}
+
+  .footer{margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);font-family:var(--mono);}
+  .pnum{color:var(--green);font-weight:700;}
+
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:10px;}h1{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hr">
+    <div>
+      <div class="tn">Topics 10–12 of 12</div>
+      <h1>ML Best Practices + Well-Architected ML Lens + Exam Prep</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01 · Final Topics</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🤝 Responsible AI &amp; ML Design Principles</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <div class="c c-g">
+    <div class="ct gr">🌱 Responsible AI — 8 Core Dimensions</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">
+      <div class="ai-dim">⚖️ <strong style="color:var(--text);">Fairness</strong></div>
+      <div class="ai-dim">🔍 <strong style="color:var(--text);">Explainability</strong></div>
+      <div class="ai-dim">🔒 <strong style="color:var(--text);">Privacy &amp; Security</strong></div>
+      <div class="ai-dim">🛡 <strong style="color:var(--text);">Safety</strong></div>
+      <div class="ai-dim">🕹 <strong style="color:var(--text);">Controllability</strong></div>
+      <div class="ai-dim">✅ <strong style="color:var(--text);">Veracity &amp; Robustness</strong></div>
+      <div class="ai-dim">📋 <strong style="color:var(--text);">Governance</strong></div>
+      <div class="ai-dim">👁 <strong style="color:var(--text);">Transparency</strong></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">AWS Tools for Responsible AI:</div>
+    <table class="tbl">
+      <tr><td>Amazon Bedrock</td><td>Model evaluation tools (accuracy, toxicity, BERTScore, F1)</td></tr>
+      <tr><td>SageMaker Clarify</td><td>Bias detection, model evaluation, explainability (SHAP)</td></tr>
+      <tr><td>SageMaker Model Monitor</td><td>Alerts for inaccurate responses, data drift, bias drift</td></tr>
+      <tr><td>Amazon A2I</td><td>Human-in-the-loop for low-confidence predictions</td></tr>
+      <tr><td>SageMaker ML Governance</td><td>Role Manager, Model Cards, Model Dashboard</td></tr>
+    </table>
+    <div class="tg"><strong>AWS Well-Architected ML Lens:</strong> Custom JSON "lens" for the AWS Well-Architected Tool. Interviews you on how you use ML and guides improvement. White paper available at docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens</div>
+  </div>
+
+  <div class="c c-teal">
+    <div class="ct tl">🏗 ML Design Principles</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--teal);margin-bottom:3px;">Ownership &amp; Protection</div>
+        <ul class="cl">
+          <li>Assign clear ownership</li>
+          <li>Security controls</li>
+          <li>Enable fault tolerance + recoverability</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:3px;">Reusability &amp; Reproducibility</div>
+        <ul class="cl">
+          <li>Enable reusability</li>
+          <li>Version control everything</li>
+          <li>Enable reproducibility</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--yellow);margin-bottom:3px;">Automation &amp; Improvement</div>
+        <ul class="cl">
+          <li>Reduce cost, optimize resources</li>
+          <li>CI/CD + CT (Continuous Training)</li>
+          <li>Monitoring &amp; continuous improvement</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">Sustainability</div>
+        <ul class="cl">
+          <li>Use managed services</li>
+          <li>Efficient hardware + software</li>
+          <li>Minimize environmental impact</li>
+          <li>Select greener AWS regions</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">♻️ ML Lifecycle Best Practices — AWS Tool Mapping</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Business Goal + Data -->
+  <div class="c c-b">
+    <div class="ct bl">🎯 Business Goal &amp; Data Processing</div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--blue);">1. Business Goal Identification</div>
+      <div class="phase-body">Define KPIs, ROI, model explainability level. Validate data permissions/privacy/license. Define environmental impact/sustainability goals. Use managed services to reduce TCO.</div>
+    </div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--teal);">2. Problem Framing</div>
+      <div class="phase-body">
+        <div><span class="tag t-t">SageMaker Role Manager</span> roles/responsibilities</div>
+        <div><span class="tag t-b">SageMaker Experiments</span> model improvement</div>
+        <div><span class="tag t-b">Lineage Tracking</span> + <span class="tag t-b">Feature Store</span></div>
+        <div><span class="tag t-b">Model Monitor</span> + <span class="tag t-b">A2I</span> feedback loops</div>
+        <div><span class="tag t-v">Clarify</span> fairness + explainability</div>
+        <div><span class="tag t-g">Glue DataBrew</span> data encryption/obfuscation</div>
+        <div><span class="tag t-g">API Gateway</span> abstract change from consumers</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--yellow);">3. Data Processing</div>
+      <div class="phase-body">
+        <div><span class="tag t-y">Data Wrangler</span> interactive analysis</div>
+        <div><span class="tag t-y">Glue</span> data catalog + ETL</div>
+        <div><span class="tag t-y">Ground Truth</span> managed labeling</div>
+        <div><span class="tag t-y">Feature Store</span> feature reusability</div>
+        <div><span class="tag t-y">Macie</span> protect PII in S3</div>
+        <div><span class="tag t-y">Lineage Tracker</span> data provenance</div>
+        <div><span class="tag t-y">IAM + KMS + PrivateLink</span> security</div>
+        <div style="margin-top:3px; font-size:10px; color:var(--dim);">Remove PII: Comprehend, Transcribe, Athena</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Model Development -->
+  <div class="c c-v">
+    <div class="ct vl">🔬 Model Development (Training &amp; Tuning)</div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--violet);">Security &amp; Governance</div>
+      <div class="phase-body">
+        <div><span class="tag t-v">CloudFormation/CDK/Pipelines</span> MLOps CI/CD</div>
+        <div><span class="tag t-v">ECR/CodeArtifact</span> approved libraries</div>
+        <div><span class="tag t-v">SageMaker inter-node encryption</span></div>
+        <div><span class="tag t-v">Clarify</span> data poisoning protection</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--blue);">Training Best Practices</div>
+      <div class="phase-body">
+        <div><span class="tag t-b">Feature Store</span> feature consistency train/inference</div>
+        <div><span class="tag t-b">Experiments</span> model validation + perf comparison</div>
+        <div><span class="tag t-b">Clarify</span> bias detection/mitigation</div>
+        <div><span class="tag t-b">Debugger</span> transfer learning issues</div>
+        <div><span class="tag t-b">Autopilot</span> AutoML</div>
+        <div><span class="tag t-b">Spot Instances</span> managed training (90% savings)</div>
+        <div><span class="tag t-b">Distributed Training</span> for large models</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--green);">Cost &amp; Sustainability</div>
+      <div class="phase-body">
+        <div>Stop resources when idle → Lifecycle configs, auto-shutdown</div>
+        <div>Start with small datasets. Warm-start + checkpointing.</div>
+        <div>Bayesian/Hyperband (not random/grid search)</div>
+        <div>Tune ONLY most important hyperparameters</div>
+        <div>Define "enough accuracy" → use early stopping</div>
+        <div><span class="tag t-g">Trainium</span> training, <span class="tag t-g">Inferentia</span> inference, <span class="tag t-g">Graviton3</span> CPU</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deployment + Monitoring -->
+  <div class="c c-o">
+    <div class="ct or">🚀 Deployment &amp; Monitoring Best Practices</div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--orange);">Deployment</div>
+      <div class="phase-body">
+        <div><span class="tag t-o">CloudWatch + EventBridge + SNS</span> metrics</div>
+        <div><span class="tag t-o">Model Monitor</span> adversarial protection</div>
+        <div><span class="tag t-o">SageMaker Pipelines</span> automate endpoint changes</div>
+        <div>Strategy: Blue/Green, A/B, Linear, Canary</div>
+        <div>Cloud vs Edge: <span class="tag t-o">Neo</span> + <span class="tag t-o">IoT Greengrass</span></div>
+        <div>Options: Real-time, Serverless, Async, Batch</div>
+        <div>Cost-effective silicon: <span class="tag t-o">Inferentia (inf2)</span>, <span class="tag t-o">Graviton3</span></div>
+        <div>Multi-model endpoint via <span class="tag t-o">Inference Pipelines</span></div>
+        <div><span class="tag t-o">Inference Recommender</span> right-size fleet</div>
+      </div>
+    </div>
+    <div class="phase">
+      <div class="phase-title" style="color:var(--yellow);">Monitoring</div>
+      <div class="phase-body">
+        <div><span class="tag t-y">Model Monitor</span> observability (data/model/bias/feature drift)</div>
+        <div><span class="tag t-y">Clarify</span> explainability + bias evaluation</div>
+        <div><span class="tag t-y">CloudFormation</span> config skew across environments</div>
+        <div><span class="tag t-y">GuardDuty + Macie</span> anomalous human activity</div>
+        <div><span class="tag t-y">A2I</span> human-in-the-loop monitoring</div>
+        <div><span class="tag t-y">Pipelines + Jenkins</span> automated retraining</div>
+        <div>Retrain only when necessary (define acceptable accuracy floor)</div>
+        <div><span class="tag t-y">QuickSight</span> monitor ROI</div>
+        <div>Use FSx for Lustre instead of S3 for training? (Consider!)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">📋 Complete AWS ML Tool Quick-Reference</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g4">
+
+  <div class="c c-g">
+    <div class="ct gr">📦 Data Ingestion</div>
+    <div class="ref-item"><div class="ref-task">Streaming real-time data</div><div class="ref-tools">Kinesis Data Streams, MSK (Kafka)</div></div>
+    <div class="ref-item"><div class="ref-task">Load data to S3/Redshift</div><div class="ref-tools">Data Firehose (near-real-time)</div></div>
+    <div class="ref-item"><div class="ref-task">Store raw files</div><div class="ref-tools">S3 (data lake), EBS, EFS, FSx Lustre</div></div>
+    <div class="ref-item"><div class="ref-task">Query S3 directly</div><div class="ref-tools">Athena ($5/TB, use Parquet!)</div></div>
+    <div class="ref-item"><div class="ref-task">ETL pipelines</div><div class="ref-tools">AWS Glue (serverless ETL)</div></div>
+    <div class="ref-item"><div class="ref-task">Visual ETL</div><div class="ref-tools">Glue Studio, DataBrew</div></div>
+    <div class="ref-item"><div class="ref-task">Big data processing</div><div class="ref-tools">EMR (Spark, Hadoop, Hive)</div></div>
+    <div class="ref-item"><div class="ref-task">Anomaly in streams</div><div class="ref-tools">RANDOM_CUT_FOREST (Kinesis Analytics)</div></div>
+    <div class="ref-item"><div class="ref-task">Secure data lake</div><div class="ref-tools">AWS Lake Formation (built on Glue)</div></div>
+  </div>
+
+  <div class="c c-b">
+    <div class="ct bl">🔬 ML Development</div>
+    <div class="ref-item"><div class="ref-task">All-in-one ML platform</div><div class="ref-tools">Amazon SageMaker</div></div>
+    <div class="ref-item"><div class="ref-task">No-code ML</div><div class="ref-tools">SageMaker Canvas (CSV, business analysts)</div></div>
+    <div class="ref-item"><div class="ref-task">AutoML</div><div class="ref-tools">SageMaker Autopilot</div></div>
+    <div class="ref-item"><div class="ref-task">Data preparation (visual)</div><div class="ref-tools">SageMaker Data Wrangler (300+ transforms)</div></div>
+    <div class="ref-item"><div class="ref-task">Human labeling</div><div class="ref-tools">SageMaker Ground Truth (70% cost reduction)</div></div>
+    <div class="ref-item"><div class="ref-task">Feature management</div><div class="ref-tools">SageMaker Feature Store (online + offline)</div></div>
+    <div class="ref-item"><div class="ref-task">Hyperparameter tuning</div><div class="ref-tools">SageMaker AMT (Bayesian, Hyperband)</div></div>
+    <div class="ref-item"><div class="ref-task">Training debugging</div><div class="ref-tools">SageMaker Debugger + Experiments</div></div>
+    <div class="ref-item"><div class="ref-task">Pre-trained models</div><div class="ref-tools">SageMaker JumpStart</div></div>
+    <div class="ref-item"><div class="ref-task">LLM/GenAI foundation</div><div class="ref-tools">Amazon Bedrock (serverless FM API)</div></div>
+  </div>
+
+  <div class="c c-v">
+    <div class="ct vl">🚀 ML Deployment</div>
+    <div class="ref-item"><div class="ref-task">Low-latency predictions</div><div class="ref-tools">Real-time inference endpoint</div></div>
+    <div class="ref-item"><div class="ref-task">Idle/unpredictable traffic</div><div class="ref-tools">Serverless Inference (cold starts OK)</div></div>
+    <div class="ref-item"><div class="ref-task">Large payloads (&gt;1GB) / long jobs</div><div class="ref-tools">Async Inference (up to 1GB payload)</div></div>
+    <div class="ref-item"><div class="ref-task">Entire dataset predictions</div><div class="ref-tools">Batch Transform</div></div>
+    <div class="ref-item"><div class="ref-task">A/B testing live traffic</div><div class="ref-tools">Production Variants + weights</div></div>
+    <div class="ref-item"><div class="ref-task">Safe rollouts</div><div class="ref-tools">Blue/Green (All-at-once, Canary, Linear)</div></div>
+    <div class="ref-item"><div class="ref-task">Edge deployment</div><div class="ref-tools">SageMaker Neo + IoT Greengrass</div></div>
+    <div class="ref-item"><div class="ref-task">Pre/post-processing pipeline</div><div class="ref-tools">Inference Pipelines (2-15 containers)</div></div>
+    <div class="ref-item"><div class="ref-task">Right-size instances</div><div class="ref-tools">Inference Recommender (45min/2hr)</div></div>
+    <div class="ref-item"><div class="ref-task">Cost savings training</div><div class="ref-tools">Managed Spot Training (90% savings)</div></div>
+  </div>
+
+  <div class="c c-y">
+    <div class="ct yl">🔍 Monitoring &amp; Governance</div>
+    <div class="ref-item"><div class="ref-task">Model/data drift alerts</div><div class="ref-tools">SageMaker Model Monitor (4 types)</div></div>
+    <div class="ref-item"><div class="ref-task">Bias detection</div><div class="ref-tools">SageMaker Clarify (CI, DPL, KS, KL, CDD…)</div></div>
+    <div class="ref-item"><div class="ref-task">Feature attribution (SHAP)</div><div class="ref-tools">SageMaker Clarify SHAP</div></div>
+    <div class="ref-item"><div class="ref-task">Model version control</div><div class="ref-tools">SageMaker Model Registry</div></div>
+    <div class="ref-item"><div class="ref-task">ML pipeline CI/CD</div><div class="ref-tools">SageMaker Pipelines + Projects</div></div>
+    <div class="ref-item"><div class="ref-task">Cloud infrastructure metrics</div><div class="ref-tools">CloudWatch (metrics, logs, alarms)</div></div>
+    <div class="ref-item"><div class="ref-task">API audit trail</div><div class="ref-tools">CloudTrail (90 days, then S3+Athena)</div></div>
+    <div class="ref-item"><div class="ref-task">Config compliance</div><div class="ref-tools">AWS Config (no deny, just alert)</div></div>
+    <div class="ref-item"><div class="ref-task">Cost monitoring</div><div class="ref-tools">Budgets + Cost Explorer + tagging</div></div>
+    <div class="ref-item"><div class="ref-task">Business analytics/BI</div><div class="ref-tools">Amazon QuickSight (SPICE, ML insights)</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🎓 Exam Preparation — Format, Strategy &amp; Resources</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Exam Format -->
+  <div class="c c-cyan">
+    <div class="ct cy">📝 Exam Format (MLA-C01)</div>
+    <div class="exam-stat"><span class="exam-label">Duration</span><span class="exam-val">170 minutes (3 hrs)</span></div>
+    <div class="exam-stat"><span class="exam-label">Questions</span><span class="exam-val">65 (85 during beta)</span></div>
+    <div class="exam-stat"><span class="exam-label">Cost</span><span class="exam-val">$300 USD</span></div>
+    <div class="exam-stat"><span class="exam-label">Passing Score</span><span class="exam-val">~720/1000</span></div>
+    <div class="exam-stat"><span class="exam-label">Pace target</span><span class="exam-val">~2.5 min/question</span></div>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Question Types:</div>
+    <div class="qtype">
+      <div class="qtype-name">Multiple Choice</div>
+      <div class="qtype-desc">1 correct answer out of 4. Classic format.</div>
+    </div>
+    <div class="qtype">
+      <div class="qtype-name">Multiple Response</div>
+      <div class="qtype-desc">2+ correct answers out of 5+. No partial credit.</div>
+    </div>
+    <div class="qtype" style="border-color:var(--yellow);">
+      <div class="qtype-name" style="color:var(--yellow);">Ordering ★ NEW</div>
+      <div class="qtype-desc">Put 3-5 responses in the correct order. No partial credit.</div>
+    </div>
+    <div class="qtype" style="border-color:var(--orange);">
+      <div class="qtype-name" style="color:var(--orange);">Matching ★ NEW</div>
+      <div class="qtype-desc">Match responses to 3-7 prompts. No partial credit.</div>
+    </div>
+    <div class="qtype" style="border-color:var(--pink);">
+      <div class="qtype-name" style="color:var(--pink);">Case Study ★ NEW</div>
+      <div class="qtype-desc">Same scenario across 2+ questions. Each evaluated separately.</div>
+    </div>
+    <div class="ty"><strong>⚡ No partial credit</strong> on Ordering, Matching questions — either all right or all wrong. Prioritize Multiple Choice/Response if pressed for time.</div>
+  </div>
+
+  <!-- Strategy -->
+  <div class="c c-l">
+    <div class="ct lm">🧠 Exam Strategy</div>
+    <div style="font-size:11px;font-weight:700;color:var(--lime);margin-bottom:5px;">Before the Exam:</div>
+    <ul class="cl">
+      <li>Use bathroom before heading in</li>
+      <li>Eat something (but not right before)</li>
+      <li>Get a good night's sleep</li>
+      <li>Review must-memorize facts (Recall, Precision, F1, Regularization)</li>
+      <li>Schedule when your energy is highest</li>
+      <li>Practice exams repeatedly until consistent scores</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">During the Exam:</div>
+    <ul class="cl">
+      <li><strong>Don't rush</strong> — understand what you're optimizing for</li>
+      <li>For each question: understand requirements + the whole system</li>
+      <li>Target 2–2.5 minutes per question</li>
+      <li>Taking too long? Best guess → flag → revisit later</li>
+      <li><strong>Use the flag capability!</strong> You'll have time to go back.</li>
+      <li><strong>Process of elimination</strong> — eliminate wrong answers first</li>
+      <li>Note paper/dry-erase board provided. Use it for formulas!</li>
+      <li>Keep calm — you don't need 100%</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Question Mindset:</div>
+    <ul class="cl">
+      <li>What metric/outcome is being optimized for?</li>
+      <li>What are the specific requirements/constraints?</li>
+      <li>What is the BEST answer (not just a correct one)?</li>
+      <li>Think about cost, scalability, serverless vs managed</li>
+    </ul>
+    <div class="tg"><strong>Resources:</strong> AWS Skill Builder (free "Standard Exam Prep Plan" + 20-question practice set). SageMaker Developer Guide. Amazon's official Exam Guide. Practice exams on Udemy/Whizlabs.</div>
+  </div>
+
+  <!-- Last-Minute Must-Know -->
+  <div class="c c-amber">
+    <div class="ct am">⚡ Last-Minute Must-Memorize</div>
+    <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:4px;">Metrics Formulas:</div>
+    <div style="background:var(--s2);border-radius:5px;padding:7px;font-family:var(--mono);font-size:10px;margin-bottom:6px;">
+      <div style="color:var(--green);">Recall = TP / (TP + FN)</div>
+      <div style="color:var(--blue);">Precision = TP / (TP + FP)</div>
+      <div style="color:var(--violet);">F1 = 2 × (P × R) / (P + R)</div>
+      <div style="color:var(--yellow);">Specificity = TN / (TN + FP)</div>
+      <div style="color:var(--orange);">AUC 0.5 = useless | AUC 1.0 = perfect</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Key Numbers:</div>
+    <div style="background:var(--s2);border-radius:5px;padding:7px;font-size:10px;font-family:var(--mono);margin-bottom:6px;">
+      <div style="color:var(--green);">S3 durability: 11 nines (99.999999999%)</div>
+      <div style="color:var(--teal);">Kinesis shard: 1MB/s in, 2MB/s out</div>
+      <div style="color:var(--blue);">Ground Truth: 70% cost reduction</div>
+      <div style="color:var(--violet);">Managed Spot: up to 90% cost savings</div>
+      <div style="color:var(--yellow);">Async inference: up to 1GB payload</div>
+      <div style="color:var(--orange);">Inference Recommender: 45min / 2hr</div>
+      <div style="color:var(--pink);">Shield Advanced: $3,000/month/org</div>
+      <div style="color:var(--red);">Step Functions max: 1 year execution</div>
+      <div style="color:var(--lime);">Trainium: 50% training cost savings</div>
+      <div style="color:var(--sky);">Inferentia: 70% inference cost savings, 4x throughput</div>
+      <div style="color:var(--cyan);">DistilBERT: 40% smaller than BERT</div>
+      <div style="color:var(--amber);">EMR Serverless: 10% memory overhead for Spark</div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">When to use Recall vs Precision:</div>
+    <div style="background:var(--s2);border-radius:5px;padding:7px;font-size:11px;">
+      <div style="color:var(--green);">Recall: FN is costly → fraud, disease detection</div>
+      <div style="color:var(--blue);">Precision: FP is costly → drug tests, spam filters</div>
+      <div style="color:var(--violet);">F1: Both matter → balanced approach</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🗺 Final Master Cheat — Every Topic at a Glance</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="c c-g full">
+  <div class="ct gr">📚 Complete MLA-C01 Topic Summary</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--green);">
+      <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">T1: Data Ingestion &amp; Storage</div>
+      <div style="font-size:10px;color:var(--dim);">S3 storage classes, Kinesis vs MSK, EBS/EFS/FSx, ETL pipelines, Data Lake vs Warehouse, Parquet over CSV</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--teal);">
+      <div style="font-size:10px;font-weight:700;color:var(--teal);margin-bottom:3px;">T2: Data Transformation</div>
+      <div style="font-size:10px;color:var(--dim);">EMR (master/core/task nodes), SMOTE, Glue DataBrew PII, Feature Store (online/offline), Data Wrangler, Athena CTAS</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--blue);">
+      <div style="font-size:10px;font-weight:700;color:var(--blue);margin-bottom:3px;">T3: Managed AI Services</div>
+      <div style="font-size:10px;color:var(--dim);">Comprehend NLP, Transcribe ASR/Toxicity, Rekognition+A2I, Lex intents/slots, Kendra incremental learning, Personalize recipes, Fraud Detector</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--violet);">
+      <div style="font-size:10px;font-weight:700;color:var(--violet);margin-bottom:3px;">T4: SageMaker Algorithms</div>
+      <div style="font-size:10px;color:var(--dim);">18 built-in algorithms. XGBoost=memory-bound M5. Seq2Seq=GPU only. DeepAR=time series RNN. RCF=anomaly no-GPU. LDA=CPU only. FM=sparse data.</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--pink);">
+      <div style="font-size:10px;font-weight:700;color:var(--pink);margin-bottom:3px;">T5: Training, Tuning &amp; Evaluation</div>
+      <div style="font-size:10px;color:var(--dim);">ReLU/TanH/Softmax, L1 vs L2, batch size/LR tradeoffs, Recall/Precision/F1/AUC, Bayesian vs Hyperband, Autopilot HPO vs Ensembling</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--orange);">
+      <div style="font-size:10px;font-weight:700;color:var(--orange);margin-bottom:3px;">T6: Generative AI Fundamentals</div>
+      <div style="font-size:10px;color:var(--dim);">Transformers Q/K/V attention, GPT=decoder only, BERT=encoder only, Temperature/TopP/TopK, RAG vs Fine-tuning, Bedrock Knowledge Bases, LLM Agents</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--yellow);">
+      <div style="font-size:10px;font-weight:700;color:var(--yellow);margin-bottom:3px;">T7: MLOps</div>
+      <div style="font-size:10px;color:var(--dim);">ECS/ECR/EKS, CDK→CloudFormation, CI/CD pipeline (CodeBuild/Deploy/Pipeline), Step Functions Map state, MWAA DAGs, Lake Formation ACID</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--red);">
+      <div style="font-size:10px;font-weight:700;color:var(--red);margin-bottom:3px;">T8: Security &amp; Identity</div>
+      <div style="font-size:10px;color:var(--dim);">IAM least-privilege, KMS symmetric/asymmetric, NACL stateless vs SG stateful, WAF=Layer7 no NLB, Shield Standard=free, SageMaker VPC+PrivateLink</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--lime);">
+      <div style="font-size:10px;font-weight:700;color:var(--lime);margin-bottom:3px;">T9: Management &amp; Governance</div>
+      <div style="font-size:10px;color:var(--dim);">CloudWatch metrics/logs/alarms, CloudTrail=audit (90d), Config=compliance (no deny), X-Ray=tracing, Trusted Advisor 6 categories, Budgets, Cost Explorer</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--cyan);">
+      <div style="font-size:10px;font-weight:700;color:var(--cyan);margin-bottom:3px;">T10: ML Best Practices</div>
+      <div style="font-size:10px;color:var(--dim);">8 Responsible AI dimensions, ML lifecycle (Business→Frame→Data→Train→Deploy→Monitor), AWS tools at each phase, sustainability principles</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--amber);">
+      <div style="font-size:10px;font-weight:700;color:var(--amber);margin-bottom:3px;">T11: Well-Architected ML Lens</div>
+      <div style="font-size:10px;color:var(--dim);">Custom JSON lens for AWS Well-Architected Tool. 6 phases. Each phase has AWS tool recommendations. MLOps Workload Orchestrator has 12 pipelines.</div>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;border-left:3px solid var(--green);">
+      <div style="font-size:10px;font-weight:700;color:var(--green);margin-bottom:3px;">T12: Exam Preparation</div>
+      <div style="font-size:10px;color:var(--dim);">170min, 65Q, $300. 5 question types incl. Ordering/Matching/Case Study. Flag+revisit. Process of elimination. Don't need 100% — just pass!</div>
+    </div>
+  </div>
+  <div class="tg" style="margin-top:8px;"><strong>🎉 You've covered all 12 topics!</strong> Complete all practice exams before sitting the real exam. AWS Skill Builder has the official practice set. Good luck! 🚀</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topics 10–12: ML Best Practices + Exam Prep · FINAL</span>
+  <span class="pnum">10–12 / 12 ✓</span>
+</div>
+
+</body>
+</html>

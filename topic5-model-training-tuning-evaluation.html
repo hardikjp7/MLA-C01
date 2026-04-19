@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 5: Model Training, Tuning & Evaluation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg:#07080f;
+    --s1:#0d0e1a;
+    --s2:#12142a;
+    --bd:#1a1d3a;
+    --cyan:#22d3ee;
+    --blue:#60a5fa;
+    --violet:#a78bfa;
+    --pink:#f472b6;
+    --orange:#fb923c;
+    --green:#4ade80;
+    --yellow:#fbbf24;
+    --red:#f87171;
+    --lime:#a3e635;
+    --sky:#7dd3fc;
+    --teal:#2dd4bf;
+    --text:#dce8f5;
+    --dim:#546880;
+    --mono:'Roboto Mono',monospace;
+    --sans:'Manrope',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12.5px;line-height:1.5;padding:18px;}
+
+  /* HEADER */
+  .hdr{background:linear-gradient(135deg,#07080f,#0e1026,#07080f);border:1px solid var(--violet);border-radius:12px;padding:18px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 70%);pointer-events:none;}
+  .hr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+  .tn{font-family:var(--mono);font-size:11px;color:var(--violet);letter-spacing:2px;text-transform:uppercase;}
+  h1{font-size:22px;font-weight:800;background:linear-gradient(90deg,var(--blue),var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:4px 0 2px;}
+  .sub{color:var(--dim);font-size:11px;}
+  .bdg{background:var(--violet);color:white;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px;}
+
+  /* SECTION */
+  .sec{font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:3px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd);}
+
+  /* GRID */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+  .full{margin-bottom:10px;}
+
+  /* CARD */
+  .c{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:11px;}
+  .c-c{border-top:3px solid var(--cyan);}
+  .c-b{border-top:3px solid var(--blue);}
+  .c-v{border-top:3px solid var(--violet);}
+  .c-p{border-top:3px solid var(--pink);}
+  .c-o{border-top:3px solid var(--orange);}
+  .c-g{border-top:3px solid var(--green);}
+  .c-y{border-top:3px solid var(--yellow);}
+  .c-r{border-top:3px solid var(--red);}
+  .c-l{border-top:3px solid var(--lime);}
+  .c-t{border-top:3px solid var(--teal);}
+
+  /* TITLE */
+  .ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+  .ct.c{color:var(--cyan);}.ct.b{color:var(--blue);}.ct.v{color:var(--violet);}.ct.p{color:var(--pink);}
+  .ct.o{color:var(--orange);}.ct.g{color:var(--green);}.ct.y{color:var(--yellow);}.ct.r{color:var(--red);}
+  .ct.l{color:var(--lime);}.ct.t{color:var(--teal);}
+
+  /* LIST */
+  ul.cl{list-style:none;}
+  ul.cl li{padding:2px 0 2px 13px;position:relative;color:var(--dim);font-size:11.5px;}
+  ul.cl li::before{content:'▸';position:absolute;left:0;color:var(--cyan);font-size:9px;top:5px;}
+  ul.cl li strong{color:var(--text);}
+
+  /* TAG */
+  .tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;}
+  .t-c{background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.2);}
+  .t-b{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+  .t-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.2);}
+  .t-p{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.2);}
+  .t-o{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2);}
+  .t-g{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);}
+  .t-y{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2);}
+  .t-r{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+  .t-l{background:rgba(163,230,53,.1);color:var(--lime);border:1px solid rgba(163,230,53,.2);}
+  .t-t{background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
+
+  /* TIP */
+  .ty{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--yellow);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .ty strong{color:var(--yellow);}
+  .tr{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-left:3px solid var(--red);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tr strong{color:var(--red);}
+  .tg{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-left:3px solid var(--green);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tg strong{color:var(--green);}
+  .tc{background:rgba(34,211,238,.05);border:1px solid rgba(34,211,238,.15);border-left:3px solid var(--cyan);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tc strong{color:var(--cyan);}
+
+  /* TABLE */
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--s2);padding:5px 8px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--bd);}
+  .tbl td{padding:5px 8px;border-bottom:1px solid rgba(26,29,58,.6);color:var(--dim);vertical-align:top;}
+  .tbl td:first-child{color:var(--text);font-weight:600;}
+  .tbl tr:last-child td{border-bottom:none;}
+
+  /* METRIC BOX */
+  .mbox{background:var(--s2);border-radius:6px;padding:8px 10px;margin-bottom:5px;}
+  .mlabel{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:3px;}
+  .mform{font-family:var(--mono);font-size:11px;color:var(--text);background:rgba(0,0,0,.3);border-radius:4px;padding:3px 7px;margin:3px 0;display:inline-block;}
+  .mwhen{font-size:10px;color:var(--dim);}
+
+  /* CONFUSION MATRIX */
+  .cm{display:grid;grid-template-columns:auto 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:3px;margin:6px 0;font-size:10px;}
+  .cm-corner{background:transparent;}
+  .cm-header{background:var(--s2);border-radius:4px;padding:4px 6px;text-align:center;font-family:var(--mono);font-size:9px;color:var(--dim);font-weight:700;}
+  .cm-cell{border-radius:4px;padding:5px 8px;text-align:center;font-family:var(--mono);font-size:11px;font-weight:700;}
+  .cm-tp{background:rgba(74,222,128,.15);color:var(--green);}
+  .cm-tn{background:rgba(74,222,128,.15);color:var(--green);}
+  .cm-fp{background:rgba(248,113,113,.15);color:var(--red);}
+  .cm-fn{background:rgba(248,113,113,.15);color:var(--red);}
+  .cm-label{background:var(--s2);border-radius:4px;padding:4px 6px;font-family:var(--mono);font-size:9px;color:var(--dim);writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);text-align:center;}
+
+  /* ACTIVATION GRID */
+  .act-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
+  .act-item{background:var(--s2);border-radius:5px;padding:6px 8px;}
+  .act-name{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:2px;}
+  .act-desc{font-size:10px;color:var(--dim);}
+
+  /* TUNING APPROACH */
+  .ta{background:var(--s2);border-radius:5px;padding:7px 9px;margin-bottom:5px;}
+  .ta-name{font-family:var(--mono);font-size:10px;font-weight:700;margin-bottom:3px;}
+  .ta-desc{font-size:11px;color:var(--dim);}
+
+  /* FOOTER */
+  .footer{margin-top:16px;padding-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);font-family:var(--mono);}
+  .pnum{color:var(--violet);font-weight:700;}
+
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:10px;}h1{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hr">
+    <div>
+      <div class="tn">Topic 05 of 12</div>
+      <h1>Model Training, Tuning &amp; Evaluation</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🧠 Deep Learning Fundamentals</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Neural Network Types -->
+  <div class="c c-b">
+    <div class="ct b">⚡ Neural Network Types</div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Feedforward (MLP)</div>
+      <div style="font-size:11px;color:var(--dim);">Standard layers, no loops. Classification, regression.</div>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">CNN (Convolutional)</div>
+      <div style="font-size:11px;color:var(--dim);">Images, feature-location invariant. Local receptive fields + convolutions + pooling. Architectures: <span class="tag t-b">LeNet-5</span><span class="tag t-b">AlexNet</span><span class="tag t-b">GoogLeNet</span><span class="tag t-b">ResNet</span></div>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">RNN (Recurrent)</div>
+      <div style="font-size:11px;color:var(--dim);">Sequential data, time series. Feedback loop = "memory cell". Trained via <strong>Backpropagation Through Time (BPTT)</strong>.</div>
+      <div style="margin-top:3px;"><span class="tag t-c">LSTM</span><span style="font-size:10px;color:var(--dim);"> (short + long-term state)</span></div>
+      <div><span class="tag t-c">GRU</span><span style="font-size:10px;color:var(--dim);"> (simplified LSTM, similar performance)</span></div>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Transformer</div>
+      <div style="font-size:11px;color:var(--dim);">Self-attention replaces RNNs. Parallelizable. BERT, GPT, T5, DistilBERT.</div>
+    </div>
+    <div class="ty"><strong>⚡ CNN topology:</strong> Conv2D → MaxPooling2D → Dropout → Flatten → Dense → Dropout → Softmax</div>
+  </div>
+
+  <!-- Activation Functions -->
+  <div class="c c-v">
+    <div class="ct v">⚡ Activation Functions</div>
+    <div class="act-grid">
+      <div class="act-item">
+        <div class="act-name" style="color:var(--red);">Linear</div>
+        <div class="act-desc">Does nothing useful. No backprop.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--red);">Binary Step</div>
+        <div class="act-desc">On/off. No multi-class. Bad slopes.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--yellow);">Sigmoid</div>
+        <div class="act-desc">0→1. Vanishing gradient problem. Expensive.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--yellow);">TanH</div>
+        <div class="act-desc">-1→1. Preferred over Sigmoid. Good for RNNs.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--green);">ReLU ⭐</div>
+        <div class="act-desc">Most popular. Fast. "Dying ReLU" when input ≤ 0.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--green);">Leaky ReLU</div>
+        <div class="act-desc">Fixes dying ReLU. Negative slope below 0.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--cyan);">PReLU</div>
+        <div class="act-desc">ReLU with learned slope. Complex, YMMV.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--cyan);">Swish</div>
+        <div class="act-desc">Google's. Great for 40+ layer networks.</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--blue);">Softmax</div>
+        <div class="act-desc">Final layer of multi-class. Probabilities. Can't produce multiple labels (sigmoid can).</div>
+      </div>
+      <div class="act-item">
+        <div class="act-name" style="color:var(--violet);">ELU / Maxout</div>
+        <div class="act-desc">Maxout = max of inputs. ReLU is special case. Doubles parameters.</div>
+      </div>
+    </div>
+    <div class="ty" style="margin-top:8px;"><strong>⚡ Choosing:</strong> Multi-class output → Softmax. RNNs → TanH. Everything else → start with ReLU → Leaky ReLU → PReLU/Maxout (last resort) → Swish (deep nets)</div>
+  </div>
+
+  <!-- Learning Rate & Batch Size -->
+  <div class="c c-orange">
+    <div class="ct o">🎛 Hyperparameter Effects</div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Learning Rate</div>
+      <table class="tbl">
+        <tr><td>Too HIGH</td><td>Overshoots optimal solution</td></tr>
+        <tr><td>Too LOW</td><td>Too slow, increases training time</td></tr>
+        <tr><td>Just right</td><td>Converges to optimal weights</td></tr>
+      </table>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Batch Size</div>
+      <table class="tbl">
+        <tr><td>Small batch</td><td>✅ Escapes local minima more easily</td></tr>
+        <tr><td>Large batch</td><td>⚠️ Can converge on wrong solution</td></tr>
+      </table>
+    </div>
+    <div style="background:var(--s2);border-radius:6px;padding:8px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:4px;">⭐ Critical Recap (Exam Favorite!)</div>
+      <ul class="cl">
+        <li><strong>Small batch</strong> → less likely to get stuck in local minima</li>
+        <li><strong>Large batch</strong> → may converge on wrong solution</li>
+        <li><strong>Large learning rate</strong> → can overshoot correct solution</li>
+        <li><strong>Small learning rate</strong> → increases training time</li>
+      </ul>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Regularization Techniques (Prevent Overfitting)</div>
+    <ul class="cl">
+      <li><strong>Dropout:</strong> Randomly zero out neurons during training</li>
+      <li><strong>Early Stopping:</strong> Stop when validation loss stops improving</li>
+      <li><strong>L1:</strong> Sum of weights → feature selection → sparse output</li>
+      <li><strong>L2:</strong> Sum of squared weights → all features kept → dense output</li>
+    </ul>
+    <div class="ty"><strong>L1 vs L2:</strong> Use L1 when you want feature selection (reduces some to 0). Use L2 when all features matter. L2 is computationally efficient.</div>
+  </div>
+</div>
+
+<!-- Vanishing Gradient + Transfer Learning -->
+<div class="g2">
+  <div class="c c-red">
+    <div class="ct r">💀 Gradient Problems &amp; Fixes</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="background:var(--s2);border-radius:5px;padding:7px;">
+        <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:3px;">Vanishing Gradient</div>
+        <div style="font-size:11px;color:var(--dim);">Slope → 0. Deep nets + RNNs. Training slows or stops. Numerical errors.</div>
+      </div>
+      <div style="background:var(--s2);border-radius:5px;padding:7px;">
+        <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:3px;">Exploding Gradient</div>
+        <div style="font-size:11px;color:var(--dim);">Opposite problem. Weights grow too large. Training diverges.</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Fixes for Vanishing Gradient:</div>
+    <ul class="cl">
+      <li><strong>Multi-level hierarchy:</strong> Sub-networks trained individually</li>
+      <li><strong>LSTM cells:</strong> Separate short + long-term memory</li>
+      <li><strong>ResNet:</strong> Skip connections maintain gradient flow</li>
+      <li><strong>Ensemble of shorter networks</strong></li>
+      <li><strong>Better activation function:</strong> Use ReLU (not sigmoid)</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">RNN Topologies:</div>
+    <table class="tbl">
+      <tr><td>Seq → Seq</td><td>Stock price prediction, time series</td></tr>
+      <tr><td>Seq → Vec</td><td>Sentence → sentiment</td></tr>
+      <tr><td>Vec → Seq</td><td>Image → caption</td></tr>
+      <tr><td>Encoder→Decoder</td><td>Machine translation (seq→vec→seq)</td></tr>
+    </table>
+  </div>
+
+  <div class="c c-teal">
+    <div class="ct t">🔁 Transfer Learning</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Approach</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>Fine-tune (continue training)</td><td>Model has WAY more training data. Use <strong>low learning rate</strong>.</td></tr>
+        <tr><td>Add new trainable layers (frozen base)</td><td>Reuse existing features, adapt to new task</td></tr>
+        <tr><td>Both (add layers + fine-tune)</td><td>New task + want to leverage pretrained features</td></tr>
+        <tr><td>Retrain from scratch</td><td>Large unique dataset, compute available, very different domain</td></tr>
+        <tr><td>Use as-is</td><td>Model's existing training data is already perfect for task</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Transformers &amp; BERT:</div>
+    <ul class="cl">
+      <li>Self-attention: processes entire sequence in parallel (not word by word)</li>
+      <li>Q, K, V matrices → scaled dot-product attention → updated embeddings</li>
+      <li><strong>GPT:</strong> Decoder-only, generates next token repeatedly. Masked self-attention.</li>
+      <li><strong>BERT:</strong> Encoder-only. Bidirectional. Masked language modeling.</li>
+      <li><strong>T5:</strong> Encoder + Decoder. Text-to-text.</li>
+      <li><strong>DistilBERT:</strong> Knowledge distillation → 40% smaller than BERT</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">LLM Key Terms:</div>
+    <div><span class="tag t-c">Temperature</span><span style="font-size:10px;color:var(--dim);"> High=random, Low=consistent.</span></div>
+    <div style="margin-top:2px;"><span class="tag t-c">Top P</span><span style="font-size:10px;color:var(--dim);"> Threshold probability for token inclusion.</span></div>
+    <div style="margin-top:2px;"><span class="tag t-c">Top K</span><span style="font-size:10px;color:var(--dim);"> K candidates for token selection.</span></div>
+    <div style="margin-top:2px;"><span class="tag t-c">Context Window</span><span style="font-size:10px;color:var(--dim);"> Max tokens the LLM can process at once.</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">📊 Model Evaluation Metrics</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+  <!-- Confusion Matrix + Metrics -->
+  <div class="c c-cyan">
+    <div class="ct c">📋 Confusion Matrix &amp; Classification Metrics</div>
+    <div class="cm">
+      <div class="cm-corner"></div>
+      <div class="cm-header">Actual YES</div>
+      <div class="cm-header">Actual NO</div>
+      <div class="cm-header">Predicted YES</div>
+      <div class="cm-cell cm-tp">TP<br><span style="font-size:9px;">True Positive</span></div>
+      <div class="cm-cell cm-fp">FP<br><span style="font-size:9px;">False Positive</span></div>
+      <div class="cm-header">Predicted NO</div>
+      <div class="cm-cell cm-fn">FN<br><span style="font-size:9px;">False Negative</span></div>
+      <div class="cm-cell cm-tn">TN<br><span style="font-size:9px;">True Negative</span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;">
+      <div class="mbox">
+        <div class="mlabel" style="color:var(--green);">Recall (Sensitivity)</div>
+        <div class="mform">TP / (TP + FN)</div>
+        <div class="mwhen">AKA: True Positive Rate, Completeness<br>Use when <strong>FN is costly</strong> (fraud, cancer screening)</div>
+      </div>
+      <div class="mbox">
+        <div class="mlabel" style="color:var(--blue);">Precision</div>
+        <div class="mform">TP / (TP + FP)</div>
+        <div class="mwhen">AKA: Correct Positives<br>Use when <strong>FP is costly</strong> (drug testing, spam filter)</div>
+      </div>
+      <div class="mbox">
+        <div class="mlabel" style="color:var(--violet);">F1 Score</div>
+        <div class="mform">2·Precision·Recall / (P+R)</div>
+        <div class="mwhen">Harmonic mean of P&amp;R. Use when both matter.</div>
+      </div>
+      <div class="mbox">
+        <div class="mlabel" style="color:var(--orange);">Specificity</div>
+        <div class="mform">TN / (TN + FP)</div>
+        <div class="mwhen">True Negative Rate. How well negatives are identified.</div>
+      </div>
+    </div>
+    <div class="mbox">
+      <div class="mlabel" style="color:var(--cyan);">Accuracy</div>
+      <div class="mform">(TP + TN) / Total</div>
+      <div class="mwhen">⚠️ Misleading on imbalanced data! "Always predict NO" = 99.9% accurate for rare diseases.</div>
+    </div>
+    <div class="ty"><strong>⚡ Multi-class Confusion Matrix:</strong> Heat map shows correct/incorrect per class. F1 per class. "Total" row = predicted frequency. "Total" column = actual frequency.</div>
+  </div>
+
+  <!-- ROC/AUC + Regression Metrics -->
+  <div class="c c-violet">
+    <div class="ct v">📈 ROC/AUC, P-R Curve &amp; Regression Metrics</div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:4px;">ROC Curve</div>
+      <ul class="cl">
+        <li>Plot of <strong>True Positive Rate (Recall) vs False Positive Rate</strong></li>
+        <li>At various threshold settings</li>
+        <li>Ideal = upper-left corner (TPR=1, FPR=0)</li>
+        <li>Points above diagonal = better than random</li>
+        <li>More bent toward upper-left = better model</li>
+      </ul>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px;">AUC (Area Under ROC Curve)</div>
+      <ul class="cl">
+        <li>Probability that classifier ranks a random positive instance higher than a random negative one</li>
+        <li><span class="tag t-r">AUC = 0.5</span> Useless (random) &nbsp; <span class="tag t-g">AUC = 1.0</span> Perfect</li>
+        <li>Most common metric for <strong>comparing classifiers</strong></li>
+      </ul>
+    </div>
+    <div style="margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--pink);margin-bottom:4px;">P-R Curve (Precision-Recall)</div>
+      <ul class="cl">
+        <li>Better than ROC for <strong>information retrieval</strong> problems</li>
+        <li>When searching large number of docs for tiny relevant subset</li>
+        <li>ROC can show misleadingly small values in this case</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:4px;">Regression Metrics</div>
+      <table class="tbl">
+        <thead><tr><th>Metric</th><th>Description</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td>RMSE</td><td>Root Mean Squared Error. Penalizes large errors more.</td><td>Continuous value prediction</td></tr>
+          <tr><td>MAE</td><td>Mean Absolute Error. Average of absolute differences.</td><td>Continuous, robust to outliers</td></tr>
+          <tr><td>R² (R-Squared)</td><td>Square of correlation between observed and predicted. 0-1, higher = better.</td><td>How well model fits data</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="ty"><strong>⚡ Quick rule:</strong> Classification → Precision/Recall/F1/AUC. Regression → RMSE/MAE/R². Imbalanced data → Recall (if FN costly) or Precision (if FP costly).</div>
+  </div>
+</div>
+
+<!-- Ensemble Learning -->
+<div class="g2">
+  <div class="c c-lime">
+    <div class="ct l">🌲 Ensemble Learning</div>
+    <table class="tbl">
+      <thead><tr><th></th><th>Bagging</th><th>Boosting</th></tr></thead>
+      <tbody>
+        <tr><td>Concept</td><td>N random resampled datasets, train in <strong>parallel</strong></td><td>Sequential training; each model corrects previous errors</td></tr>
+        <tr><td>Data</td><td>Random sampling with replacement</td><td>Weighted observations (harder samples weighted more)</td></tr>
+        <tr><td>Training</td><td>Parallel — fast!</td><td>Sequential — slower</td></tr>
+        <tr><td>Overfitting</td><td>✅ Better at avoiding</td><td>⚠️ More prone to overfit</td></tr>
+        <tr><td>Accuracy</td><td>Good</td><td>✅ Generally better accuracy</td></tr>
+        <tr><td>Example</td><td>Random Forest</td><td>XGBoost, AdaBoost</td></tr>
+      </tbody>
+    </table>
+    <div class="ty"><strong>⚡ Exam:</strong> XGBoost = boosting (sequential, higher accuracy). Random Forest = bagging (parallel, avoids overfitting). Choose based on your goal.</div>
+  </div>
+
+  <div class="c c-pink">
+    <div class="ct p">🏆 SageMaker Autopilot (AutoML)</div>
+    <ul class="cl">
+      <li>Automates: algorithm selection, data preprocessing, model tuning, infrastructure</li>
+      <li>Data: <strong>tabular CSV or Parquet only</strong></li>
+      <li>Problem types: Binary/Multiclass classification, Regression</li>
+      <li>Algorithms: Linear Learner, XGBoost, Deep Learning (MLPs), Ensemble mode</li>
+      <li>Integrates with SageMaker Clarify for explainability (SHAP)</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Training Modes:</div>
+    <table class="tbl">
+      <thead><tr><th>Mode</th><th>When</th><th>Method</th></tr></thead>
+      <tbody>
+        <tr><td>HPO</td><td>Dataset &gt;100MB (Auto mode)</td><td>100 trials; Bayesian (&lt;100MB) or Multi-fidelity (&gt;100MB)</td></tr>
+        <tr><td>Ensembling</td><td>Dataset &lt;100MB (Auto mode)</td><td>AutoGluon; 10 trials; stacking ensemble</td></tr>
+        <tr><td>Auto</td><td>Default</td><td>HPO if &gt;100MB, Ensembling if &lt;100MB. Defaults to HPO if can't read dataset size.</td></tr>
+      </tbody>
+    </table>
+    <div class="ty"><strong>⚡ Autopilot defaults to HPO if:</strong> S3 bucket inside VPC, S3DataType is ManifestFile, or S3Uri contains &gt;1000 items.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🎯 SageMaker Automatic Model Tuning (AMT)</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <div class="c c-blue">
+    <div class="ct b">🔧 AMT Overview &amp; Best Practices</div>
+    <ul class="cl">
+      <li>Define: hyperparameters + ranges + objective metric</li>
+      <li>SageMaker spins up tuning jobs, <strong>learns as it goes</strong></li>
+      <li>Best results → can be deployed as a model</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Best Practices:</div>
+    <ul class="cl">
+      <li>Don't optimize <strong>too many</strong> hyperparameters at once</li>
+      <li>Limit ranges to as <strong>small as possible</strong></li>
+      <li>Use <strong>logarithmic scales</strong> when appropriate</li>
+      <li>Don't run too many jobs <strong>concurrently</strong> (limits learning)</li>
+      <li>Multi-instance jobs must report <strong>correct objective metric</strong></li>
+    </ul>
+    <div class="ty"><strong>⚡ Exam:</strong> AMT = Hyperparameter Tuning Job. Learns from previous runs. Concurrent runs reduce its ability to learn. Use logarithmic scales for learning rate etc.</div>
+  </div>
+
+  <div class="c c-cyan">
+    <div class="ct c">🔍 Tuning Search Strategies</div>
+    <div class="ta">
+      <div class="ta-name" style="color:var(--red);">Grid Search</div>
+      <div class="ta-desc">Limited to <strong>categorical parameters</strong>. Brute force — tries EVERY combination. Very slow.</div>
+    </div>
+    <div class="ta">
+      <div class="ta-name" style="color:var(--yellow);">Random Search</div>
+      <div class="ta-desc">Random HP combination each job. <strong>No dependence on prior runs → can all run in parallel.</strong> Better than grid for continuous params.</div>
+    </div>
+    <div class="ta">
+      <div class="ta-name" style="color:var(--green);">Bayesian Optimization ⭐</div>
+      <div class="ta-desc">Treats tuning as a regression problem. <strong>Learns from each run</strong> to converge faster. Sequential by nature.</div>
+    </div>
+    <div class="ta">
+      <div class="ta-name" style="color:var(--cyan);">Hyperband ⭐</div>
+      <div class="ta-desc">Best for algorithms that publish iterative results (neural nets with epochs). Dynamic resource allocation. Early stopping. Parallel. <strong>Much faster than random or Bayesian.</strong></div>
+    </div>
+    <div class="ty"><strong>⚡ Exam:</strong> Random search = fully parallel. Bayesian = sequential but smart. Hyperband = fastest for iterative training (epochs). Grid = categorical only, impractical.</div>
+  </div>
+
+  <div class="c c-green">
+    <div class="ct g">🔄 AMT Advanced Features</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Early Stopping:</div>
+    <ul class="cl">
+      <li>Stops training job early if not improving objective</li>
+      <li>Reduces compute cost + avoids overfitting</li>
+      <li>Set <code>"early stopping": "Auto"</code></li>
+      <li>Requires algorithm to emit objective metric after each epoch</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Warm Start:</div>
+    <ul class="cl">
+      <li>Uses previous tuning jobs as starting point</li>
+      <li>Two types:</li>
+      <li><strong>IDENTICAL_DATA_AND_ALGORITHM</strong> — same dataset/algo, continue search</li>
+      <li><strong>TRANSFER_LEARNING</strong> — different dataset/algo, transfer knowledge</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Resource Limits:</div>
+    <ul class="cl">
+      <li>Default limits: parallel tuning jobs, # hyperparameters, training jobs per tuning job</li>
+      <li>Increasing requires <strong>quota increase from AWS support</strong></li>
+    </ul>
+    <div class="ty"><strong>⚡ Warm Start:</strong> IDENTICAL = continue same tuning. TRANSFER_LEARNING = start from previous knowledge with different setup.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🏗 SageMaker Training Tools &amp; Techniques</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g4">
+
+  <div class="c c-violet">
+    <div class="ct v">🔬 Debugger &amp; Experiments</div>
+    <div style="font-size:11px;font-weight:700;color:var(--violet);margin-bottom:3px;">SageMaker Debugger</div>
+    <ul class="cl">
+      <li>Saves internal model state at intervals (gradients/tensors)</li>
+      <li>Define rules → debug job per rule → CloudWatch event when hit</li>
+      <li>ProfilerReport: CPU bottleneck, GPU memory, step outliers</li>
+      <li>Actions: <code>StopTraining()</code>, <code>Email()</code>, <code>SMS()</code></li>
+      <li>Frameworks: TF, PyTorch, MXNet, XGBoost</li>
+      <li>SMDebug client library for hooks</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px;">SageMaker Experiments</div>
+    <ul class="cl">
+      <li>Organize, capture, compare, search ML jobs</li>
+      <li>Track metrics across multiple training runs</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">TensorBoard</div>
+    <ul class="cl">
+      <li>Visualize loss, accuracy, model graph, weight histograms</li>
+      <li>Integrated with SageMaker console or via URL</li>
+      <li>Works with TF and PyTorch</li>
+    </ul>
+  </div>
+
+  <div class="c c-orange">
+    <div class="ct o">⚡ Training Performance</div>
+    <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:3px;">Warm Pools</div>
+    <ul class="cl">
+      <li>Retain and reuse provisioned infra between jobs</li>
+      <li>Set <code>KeepAlivePeriodInSeconds</code></li>
+      <li>Requires service limit increase request</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:3px;">Checkpointing</div>
+    <ul class="cl">
+      <li>Snapshots of training state → S3</li>
+      <li>Restart from snapshots if needed</li>
+      <li>Auto-sync from <code>/opt/ml/checkpoint</code></li>
+      <li>Set <code>checkpoint_s3_uri</code> + <code>checkpoint_local_path</code></li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Cluster Health Checks</div>
+    <ul class="cl">
+      <li>Auto on ml.g and ml.p instance types</li>
+      <li>GPU health checks + NCCL validation</li>
+      <li>Auto-restarts on SageMaker internal errors</li>
+    </ul>
+    <div class="ty"><strong>Managed Spot Training:</strong> Save up to 90% using EC2 Spot instances. Use checkpoints so training can resume if interrupted!</div>
+  </div>
+
+  <div class="c c-cyan">
+    <div class="ct c">🔢 Distributed Training</div>
+    <ul class="cl">
+      <li><strong>Rule:</strong> Max out larger instances BEFORE going multi-instance (e.g., ml.p4d.24xlarge = 8 GPUs)</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px;">Data Parallelism (SageMaker)</div>
+    <ul class="cl">
+      <li>AllReduce collective → distributes gradient updates across GPUs</li>
+      <li>AllGather → manages node communication, offloads to CPU</li>
+      <li>NOT compatible with Training Compiler</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--violet);margin-bottom:3px;">Model Parallelism (SageMaker MPP)</div>
+    <ul class="cl">
+      <li>For LLMs that won't fit on single machine (&gt;1B params)</li>
+      <li>PyTorch only</li>
+      <li>Optimization state sharding, activation checkpointing, activation offloading</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Other Frameworks</div>
+    <div><span class="tag t-b">PyTorch DDP</span><span class="tag t-v">torchrun</span><span class="tag t-o">mpirun</span><span class="tag t-g">DeepSpeed (MS)</span><span class="tag t-c">Horovod</span></div>
+    <div class="ty"><strong>EFA:</strong> Elastic Fabric Adapter → HPC-class networking for SageMaker. Use with NCCL. Set <code>FI_PROVIDER="efa"</code>. MiCS = Sharded data parallelism for 1T+ parameter models.</div>
+  </div>
+
+  <div class="c c-green">
+    <div class="ct g">🗃 Model Registry</div>
+    <ul class="cl">
+      <li>Catalog + version control for models</li>
+      <li>Associate metadata with model versions</li>
+      <li>Manage <strong>approval status</strong> (Pending/Approved/Rejected)</li>
+      <li>Deploy models to production</li>
+      <li>Automate deployment with CI/CD</li>
+      <li>Share models across teams</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Workflow:</div>
+    <div style="background:var(--s2);border-radius:5px;padding:6px;font-size:10px;color:var(--dim);">
+      Create Model Group → Create SageMaker Pipeline → Register model versions → Add to Model Registry Collections → Review + Approve → Deploy
+    </div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--yellow);margin-bottom:3px;">SageMaker Input Modes:</div>
+    <table class="tbl">
+      <tr><td>File Mode</td><td>Default. Copies S3 data to container.</td></tr>
+      <tr><td>Fast File Mode</td><td>Like Pipe but supports random access. Training starts immediately.</td></tr>
+      <tr><td>Pipe Mode</td><td>Streams from S3. Mainly replaced by Fast File.</td></tr>
+      <tr><td>S3 Express One Zone</td><td>High-perf storage class. Works with file/fast/pipe.</td></tr>
+      <tr><td>FSx for Lustre</td><td>100s GB/s. Single AZ. Requires VPC.</td></tr>
+      <tr><td>EFS</td><td>Requires data pre-loaded + VPC.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">⚠️ Exam Quick-Fire</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+  <div class="c c-yellow">
+    <div class="ct y">🎯 Critical Facts</div>
+    <ul class="cl">
+      <li>Small batch → escapes local minima. Large batch → may converge wrong.</li>
+      <li>Large learning rate → overshoots. Small → slow convergence.</li>
+      <li>L1 → feature selection (some weights → 0). L2 → all features weighted.</li>
+      <li>Softmax → multi-class final layer. Sigmoid → multi-label.</li>
+      <li>ReLU → default choice. TanH → best for RNNs.</li>
+      <li>Recall = TP/(TP+FN). Use when FN is costly (fraud, disease).</li>
+      <li>Precision = TP/(TP+FP). Use when FP is costly (drug tests).</li>
+      <li>F1 = harmonic mean of Precision + Recall.</li>
+      <li>AUC 0.5 = useless. AUC 1.0 = perfect.</li>
+      <li>Hyperband = fastest tuning for iterative algorithms (epochs).</li>
+      <li>Warm Start IDENTICAL vs TRANSFER_LEARNING — key distinction.</li>
+      <li>Managed Spot Training = 90% savings + need checkpointing!</li>
+      <li>Model Parallelism (MPP) = PyTorch only. For LLMs &gt;1B params.</li>
+      <li>AMT concurrent jobs ↑ → learning efficiency ↓</li>
+    </ul>
+  </div>
+  <div class="c c-red">
+    <div class="ct r">⚠️ Common Exam Traps</div>
+    <ul class="cl">
+      <li>Accuracy is <strong>misleading on imbalanced data</strong> — use Precision/Recall/F1</li>
+      <li>ROC AUC vs P-R Curve: <strong>P-R better for information retrieval</strong> (many negatives)</li>
+      <li>Bagging = parallel, Boosting = sequential — don't confuse</li>
+      <li>Autopilot <strong>HPO if &gt;100MB</strong>, Ensembling if &lt;100MB (Auto mode)</li>
+      <li>Autopilot defaults to HPO when it can't read dataset size</li>
+      <li>Debugger is <strong>NOT compatible</strong> with SageMaker Distributed Training Libraries</li>
+      <li>Early Stopping in AMT requires algorithm to <strong>emit metric after each epoch</strong></li>
+      <li>Multi-GPU does <strong>NOT help</strong> Linear Learner</li>
+      <li>Managed Spot Training needs <strong>checkpointing</strong> — or lose progress on interruption</li>
+      <li>FSx for Lustre = Single AZ (even though it's fast). Requires VPC setup.</li>
+      <li>LSTM = short + long-term states. GRU = simplified LSTM, similar performance.</li>
+      <li>DistilBERT = 40% smaller via <strong>knowledge distillation</strong>, not compression</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 05: Model Training, Tuning &amp; Evaluation</span>
+  <span class="pnum">5 / 12</span>
+</div>
+
+</body>
+</html>

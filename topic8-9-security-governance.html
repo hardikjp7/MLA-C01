@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topics 8 & 9: Security + Management & Governance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600;700&family=Poppins:wght@400;500;600;700;800&display=swap');
+  :root {
+    --bg:#070810;--s1:#0c0e1a;--s2:#10122a;--bd:#181a38;
+    --cyan:#22d3ee;--blue:#60a5fa;--violet:#a78bfa;--green:#4ade80;
+    --yellow:#fbbf24;--orange:#fb923c;--pink:#f472b6;--red:#f87171;
+    --sky:#7dd3fc;--lime:#a3e635;--amber:#f59e0b;--teal:#2dd4bf;
+    --text:#dce8ff;--dim:#475580;
+    --mono:'Source Code Pro',monospace;--sans:'Poppins',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:12px;line-height:1.5;padding:18px;}
+
+  .hdr{background:linear-gradient(135deg,#070810,#0e1030,#070810);border:1px solid var(--red);border-radius:12px;padding:18px 26px;margin-bottom:16px;position:relative;overflow:hidden;}
+  .hdr::after{content:'🔒';position:absolute;right:25px;top:10px;font-size:70px;opacity:.07;pointer-events:none;}
+  .hr{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;}
+  .tn{font-family:var(--mono);font-size:11px;color:var(--red);letter-spacing:2px;text-transform:uppercase;}
+  h1{font-size:21px;font-weight:800;background:linear-gradient(90deg,var(--red),var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:4px 0 2px;}
+  .sub{color:var(--dim);font-size:11px;}
+  .bdg{background:var(--red);color:#fff;font-family:var(--mono);font-size:10px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px;}
+
+  .sec{font-family:var(--mono);font-size:10px;color:var(--cyan);text-transform:uppercase;letter-spacing:3px;margin:13px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--bd);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+  .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;}
+  .full{margin-bottom:10px;}
+
+  .c{background:var(--s1);border:1px solid var(--bd);border-radius:9px;padding:11px;}
+  .c-c{border-top:3px solid var(--cyan);}  .c-b{border-top:3px solid var(--blue);}
+  .c-v{border-top:3px solid var(--violet);}  .c-g{border-top:3px solid var(--green);}
+  .c-y{border-top:3px solid var(--yellow);}  .c-o{border-top:3px solid var(--orange);}
+  .c-p{border-top:3px solid var(--pink);}   .c-r{border-top:3px solid var(--red);}
+  .c-sky{border-top:3px solid var(--sky);}  .c-l{border-top:3px solid var(--lime);}
+  .c-a{border-top:3px solid var(--amber);}  .c-t{border-top:3px solid var(--teal);}
+
+  .ct{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px;}
+  .cy{color:var(--cyan);}.bl{color:var(--blue);}.vl{color:var(--violet);}.gr{color:var(--green);}
+  .yl{color:var(--yellow);}.or{color:var(--orange);}.pk{color:var(--pink);}.rd{color:var(--red);}
+  .sk{color:var(--sky);}.lm{color:var(--lime);}.am{color:var(--amber);}.tl{color:var(--teal);}
+
+  ul.cl{list-style:none;}
+  ul.cl li{padding:2px 0 2px 13px;position:relative;color:var(--dim);font-size:11.5px;}
+  ul.cl li::before{content:'▸';position:absolute;left:0;color:var(--cyan);font-size:9px;top:5px;}
+  ul.cl li strong{color:var(--text);}
+
+  .tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:3px;margin:1px 2px 1px 0;}
+  .t-c{background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.2);}
+  .t-b{background:rgba(96,165,250,.1);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+  .t-v{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.2);}
+  .t-g{background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);}
+  .t-y{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2);}
+  .t-o{background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2);}
+  .t-r{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2);}
+  .t-p{background:rgba(244,114,182,.1);color:var(--pink);border:1px solid rgba(244,114,182,.2);}
+  .t-a{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+  .t-t{background:rgba(45,212,191,.1);color:var(--teal);border:1px solid rgba(45,212,191,.2);}
+
+  .ty{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--yellow);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .ty strong{color:var(--yellow);}
+  .tr{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.15);border-left:3px solid var(--red);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tr strong{color:var(--red);}
+  .tg{background:rgba(74,222,128,.05);border:1px solid rgba(74,222,128,.15);border-left:3px solid var(--green);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tg strong{color:var(--green);}
+  .tt{background:rgba(45,212,191,.05);border:1px solid rgba(45,212,191,.15);border-left:3px solid var(--teal);border-radius:5px;padding:5px 8px;font-size:11px;color:var(--dim);margin-top:6px;}
+  .tt strong{color:var(--teal);}
+
+  .tbl{width:100%;border-collapse:collapse;font-size:11px;}
+  .tbl th{background:var(--s2);padding:5px 7px;text-align:left;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);border-bottom:1px solid var(--bd);}
+  .tbl td{padding:5px 7px;border-bottom:1px solid rgba(24,26,56,.6);color:var(--dim);vertical-align:top;}
+  .tbl td:first-child{color:var(--text);font-weight:600;}
+  .tbl tr:last-child td{border-bottom:none;}
+
+  /* IAM Policy Structure */
+  .policy-box{background:var(--s2);border-radius:6px;padding:8px;font-family:var(--mono);font-size:10px;margin-top:5px;}
+  .pk{color:var(--cyan);}.pv{color:var(--yellow);}
+  .comment{color:var(--dim);font-style:italic;}
+
+  /* VPC diagram */
+  .vpc-row{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;}
+  .vpc-icon{font-size:14px;}
+  .vpc-label{color:var(--text);font-weight:600;min-width:100px;}
+  .vpc-desc{color:var(--dim);}
+
+  /* KMS table */
+  .kms-row{display:grid;grid-template-columns:130px 60px 1fr;gap:5px;padding:4px 0;border-bottom:1px solid rgba(24,26,56,.5);font-size:10px;align-items:start;}
+  .kms-row:last-child{border-bottom:none;}
+  .kms-type{color:var(--text);font-weight:600;font-family:var(--mono);font-size:10px;}
+  .kms-price{font-family:var(--mono);color:var(--green);font-size:10px;}
+  .kms-desc{color:var(--dim);}
+
+  .footer{margin-top:14px;padding-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--dim);font-family:var(--mono);}
+  .pnum{color:var(--red);font-weight:700;}
+
+  @media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.g2,.g3,.g4{grid-template-columns:1fr;}body{padding:10px;}h1{font-size:18px;}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hr">
+    <div>
+      <div class="tn">Topics 08 & 09 of 12</div>
+      <h1>Security, Identity &amp; Compliance + Management &amp; Governance</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">👤 IAM — Identity &amp; Access Management</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- IAM Core -->
+  <div class="c c-b">
+    <div class="ct bl">👥 IAM Core Concepts</div>
+    <ul class="cl">
+      <li><strong>Global service</strong> — not region-specific</li>
+      <li><strong>Root account:</strong> created by default. Never use or share!</li>
+      <li><strong>Users:</strong> real people. Can belong to multiple groups.</li>
+      <li><strong>Groups:</strong> contain only users (not other groups)</li>
+      <li><strong>Roles:</strong> assigned to AWS services to act on your behalf</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">IAM Policy Structure:</div>
+    <div class="policy-box">
+      <div><span class="pk">Version</span>: <span class="pv">"2012-10-17"</span> <span class="comment">// always this</span></div>
+      <div><span class="pk">Id</span>: optional identifier</div>
+      <div><span class="pk">Statement</span>: [</div>
+      <div style="padding-left:10px;"><span class="pk">Sid</span>: optional statement ID</div>
+      <div style="padding-left:10px;"><span class="pk">Effect</span>: <span class="pv">Allow</span> | <span style="color:var(--red);">Deny</span></div>
+      <div style="padding-left:10px;"><span class="pk">Principal</span>: account/user/role</div>
+      <div style="padding-left:10px;"><span class="pk">Action</span>: [list of API actions]</div>
+      <div style="padding-left:10px;"><span class="pk">Resource</span>: [ARN list]</div>
+      <div style="padding-left:10px;"><span class="pk">Condition</span>: optional</div>
+      <div>]</div>
+    </div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Predefined SageMaker Policies:</div>
+    <div><span class="tag t-b">AmazonSageMakerReadOnly</span><span class="tag t-b">AmazonSageMakerFullAccess</span><span class="tag t-b">AdministratorAccess</span><span class="tag t-b">DataScientist</span></div>
+    <div class="ty"><strong>Access rule:</strong> Explicit DENY always wins over any ALLOW. IAM principal accesses S3 if: (IAM policy ALLOWS OR resource policy ALLOWS) AND no explicit DENY.</div>
+  </div>
+
+  <!-- Password + MFA -->
+  <div class="c c-r">
+    <div class="ct rd">🔐 Password Policy &amp; MFA</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Password Policy Options:</div>
+    <ul class="cl">
+      <li>Minimum password length</li>
+      <li>Require: uppercase, lowercase, numbers, non-alphanumeric</li>
+      <li>Allow users to change their own passwords</li>
+      <li>Require password expiration after N days</li>
+      <li>Prevent password re-use</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">MFA Devices:</div>
+    <table class="tbl">
+      <tr><td>Virtual MFA</td><td>Google Authenticator (phone only), Authy (phone only). Multiple tokens per device.</td></tr>
+      <tr><td>U2F Key</td><td>YubiKey (Yubico). Multiple users per key.</td></tr>
+      <tr><td>Hardware Key Fob</td><td>Gemalto (3rd party). GovCloud: SurePassID.</td></tr>
+    </table>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">SageMaker IAM Permissions:</div>
+    <div><span class="tag t-r">CreateTrainingJob</span><span class="tag t-r">CreateModel</span><span class="tag t-r">CreateEndpointConfig</span><span class="tag t-r">CreateTransformJob</span><span class="tag t-r">CreateHyperParameterTuningJob</span><span class="tag t-r">CreateNotebookInstance</span><span class="tag t-r">UpdateNotebookInstance</span></div>
+    <div class="ty"><strong>Principle of Least Privilege:</strong> Grant only what's needed. Start broad in dev, lock down in prod. Use IAM Access Analyzer to generate least-privilege policies from actual access activity.</div>
+  </div>
+
+  <!-- Encryption -->
+  <div class="c c-y">
+    <div class="ct yl">🔒 Encryption Types</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Type</th><th>How</th><th>Key Managed By</th></tr></thead>
+      <tbody>
+        <tr><td>In-flight (TLS/SSL)</td><td>Encrypted before send, decrypted after receive. HTTPS. Prevents MITM.</td><td>TLS certs</td></tr>
+        <tr><td>Server-side at rest</td><td>Server encrypts on receive, decrypts on send. Key stored on server.</td><td>AWS / you</td></tr>
+        <tr><td>Client-side</td><td>Client encrypts before upload, decrypts after download. Server never decrypts.</td><td>You only</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Data Masking &amp; Anonymization:</div>
+    <ul class="cl">
+      <li><strong>Masking:</strong> obfuscate data (last 4 digits of CC#). Supported in Glue DataBrew + Redshift.</li>
+      <li><strong>Anonymization techniques:</strong> replace with random, shuffle, deterministic/probabilistic encrypt, hashing</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">SageMaker Data at Rest:</div>
+    <ul class="cl">
+      <li>KMS keys accepted by: notebooks, training/tuning/batch/endpoints</li>
+      <li>Everything under /opt/ml/ and /tmp can be encrypted with KMS</li>
+    </ul>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-top:5px;margin-bottom:3px;">SageMaker Data in Transit:</div>
+    <ul class="cl">
+      <li>All traffic supports TLS/SSL</li>
+      <li>Inter-node/inter-container traffic encryption = optional. May increase training time + cost.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🗝 AWS KMS — Key Management Service</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <div class="c c-y">
+    <div class="ct yl">🗝 KMS Types &amp; Pricing</div>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">Key Types:</div>
+    <table class="tbl" style="margin-bottom:8px;">
+      <thead><tr><th>Type</th><th>Algorithm</th><th>Access to Key?</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td>Symmetric</td><td>AES-256</td><td>Never directly — must call KMS API</td><td>AWS services use this (default)</td></tr>
+        <tr><td>Asymmetric</td><td>RSA / ECC</td><td>Public key downloadable. Private key never.</td><td>Encrypt outside AWS (no KMS API access)</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:5px;">KMS Key Ownership &amp; Pricing:</div>
+    <div class="kms-row">
+      <div class="kms-type">AWS Owned Keys</div>
+      <div class="kms-price">FREE</div>
+      <div class="kms-desc">SSE-S3, SSE-SQS, SSE-DDB default keys. No control.</div>
+    </div>
+    <div class="kms-row">
+      <div class="kms-type">AWS Managed Keys</div>
+      <div class="kms-price">FREE</div>
+      <div class="kms-desc">aws/rds, aws/ebs etc. Auto-rotate every 1 year.</div>
+    </div>
+    <div class="kms-row">
+      <div class="kms-type">Customer Managed (KMS)</div>
+      <div class="kms-price">$1/mo</div>
+      <div class="kms-desc">Full control. Auto/on-demand rotation (must enable). + $0.03/10K API calls.</div>
+    </div>
+    <div class="kms-row">
+      <div class="kms-type">Customer Managed (Imported)</div>
+      <div class="kms-price">$1/mo</div>
+      <div class="kms-desc">Manual rotation only via alias. No auto-rotation.</div>
+    </div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">Key Policies:</div>
+    <ul class="cl">
+      <li>Without a key policy: you CANNOT control access to the key at all</li>
+      <li><strong>Default policy:</strong> root user = full access to key (entire account)</li>
+      <li><strong>Custom policy:</strong> define users/roles, admin rights, cross-account access</li>
+    </ul>
+    <div class="ty"><strong>Cross-region snapshot copy:</strong> Snapshot encrypted with KMS Key A in eu-west-2 → copy to ap-southeast-2 → ReEncrypt with KMS Key B (different region key). Cross-account: attach KMS Key Policy to authorize + share snapshot.</div>
+  </div>
+
+  <!-- SageMaker VPC + Security Services -->
+  <div class="c c-cyan">
+    <div class="ct cy">🛡 SageMaker VPC &amp; Security</div>
+    <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:4px;">SageMaker + VPC:</div>
+    <ul class="cl">
+      <li>Training jobs run in a VPC by default</li>
+      <li>Use <strong>private VPC</strong> for extra security → need S3 VPC endpoints</li>
+      <li>Notebooks are <strong>Internet-enabled by default</strong> ⚠️ security hole!</li>
+      <li>Disable internet → need PrivateLink interface endpoint OR NAT Gateway for training/hosting</li>
+      <li>Training/Inference containers = Internet-enabled by default</li>
+      <li>Network isolation = option BUT prevents S3 access</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">AWS Macie:</div>
+    <ul class="cl">
+      <li>ML-powered PII discovery + protection in S3</li>
+      <li>Scans S3 → identifies sensitive data (PII) → alerts via EventBridge</li>
+      <li>Fully managed, uses ML + pattern matching</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">AWS Secrets Manager:</div>
+    <ul class="cl">
+      <li>Store secrets securely (not in code!)</li>
+      <li>Force rotation every X days → auto-generates new secrets (via Lambda)</li>
+      <li>Secrets encrypted with KMS</li>
+      <li>Native integration: RDS (MySQL, PostgreSQL, Aurora)</li>
+      <li>Multi-region: replicate secrets across regions, promote replica to standalone</li>
+    </ul>
+    <div class="ty"><strong>SageMaker Logging:</strong> CloudWatch = invocations, endpoint latency, node health. CloudTrail = API calls + user actions in SageMaker → delivered to S3.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🌐 VPC, WAF, Shield &amp; Network Security</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- VPC Fundamentals -->
+  <div class="c c-v">
+    <div class="ct vl">🌐 VPC Networking</div>
+    <div class="vpc-row"><span class="vpc-icon">🏘</span><span class="vpc-label">VPC</span><span class="vpc-desc">Regional. Private network for your resources.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">📦</span><span class="vpc-label">Subnets</span><span class="vpc-desc">AZ-level. Public = internet accessible. Private = not.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🚪</span><span class="vpc-label">Internet Gateway</span><span class="vpc-desc">VPC-level. Enables public internet access.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🔄</span><span class="vpc-label">NAT Gateway</span><span class="vpc-desc">AWS-managed. Private subnet → internet (one-way). Stays private.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🔥</span><span class="vpc-label">NACL</span><span class="vpc-desc"><strong>Stateless.</strong> Subnet-level. ALLOW + DENY. IP addresses only.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🛡</span><span class="vpc-label">Security Group</span><span class="vpc-desc"><strong>Stateful.</strong> Instance/ENI level. ALLOW only. IPs + security groups.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">📡</span><span class="vpc-label">VPC Flow Logs</span><span class="vpc-desc">IP traffic logs → S3, CloudWatch, Firehose.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🤝</span><span class="vpc-label">VPC Peering</span><span class="vpc-desc">Connect 2 VPCs privately. No overlapping CIDR. <strong>NOT transitive!</strong></span></div>
+    <div class="vpc-row"><span class="vpc-icon">🔌</span><span class="vpc-label">VPC Endpoints</span><span class="vpc-desc">Private access to AWS services. Gateway (S3, DynamoDB) or Interface (others).</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🔗</span><span class="vpc-label">PrivateLink</span><span class="vpc-desc">Expose service to 1000s of VPCs securely. NLB + ENI. No peering/IGW/NAT needed.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">🏢</span><span class="vpc-label">Site-to-Site VPN</span><span class="vpc-desc">On-prem → AWS over public internet. Encrypted. Fast setup.</span></div>
+    <div class="vpc-row"><span class="vpc-icon">⚡</span><span class="vpc-label">Direct Connect</span><span class="vpc-desc">On-prem → AWS via private physical connection. Fast + secure. Takes ≥1 month.</span></div>
+    <div class="ty"><strong>NACL vs Security Group:</strong> NACL = stateless (check both directions), subnet level, ALLOW+DENY. SG = stateful (return traffic auto-allowed), instance level, ALLOW only.</div>
+  </div>
+
+  <!-- WAF + Shield -->
+  <div class="c c-o">
+    <div class="ct or">🛡 WAF &amp; Shield</div>
+    <div style="font-size:11px;font-weight:700;color:var(--orange);margin-bottom:4px;">AWS WAF (Web Application Firewall):</div>
+    <ul class="cl">
+      <li>Layer 7 (HTTP) protection</li>
+      <li>Deploy on: <strong>ALB, API Gateway, CloudFront, AppSync GraphQL, Cognito User Pool</strong></li>
+      <li><strong>Does NOT support NLB</strong> (Layer 4)</li>
+      <li>Define Web ACL (Web Access Control List) rules</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">WAF Rule Types:</div>
+    <div><span class="tag t-o">IP Set (10K IPs)</span><span class="tag t-o">HTTP headers/body/URI</span><span class="tag t-o">SQL injection</span><span class="tag t-o">XSS</span><span class="tag t-o">Size constraints</span><span class="tag t-o">Geo-match (block countries)</span><span class="tag t-o">Rate-based (DDoS)</span></div>
+    <div style="margin-top:6px;font-size:11px;color:var(--dim);">Web ACL = Regional EXCEPT for CloudFront (global). Rule Groups = reusable sets of rules.</div>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--red);margin-bottom:4px;">AWS Shield:</div>
+    <table class="tbl">
+      <tr><td>Shield Standard</td><td><strong>FREE</strong>. Auto-enabled for all. Layer 3/4 protection (SYN/UDP floods, reflection attacks).</td></tr>
+      <tr><td>Shield Advanced</td><td><strong>$3,000/mo/org.</strong> Layer 3/4/7. EC2, ELB, CloudFront, Global Accelerator, Route 53. 24/7 DRP team. Auto-deploys WAF rules. Protects against cost spikes.</td></tr>
+    </table>
+    <div class="ty"><strong>Fixed IP + WAF:</strong> WAF can't attach to NLB. Use Global Accelerator (fixed IP) → ALB with WAF. WebACL must be in same region as ALB.</div>
+  </div>
+
+  <!-- General Security Summary -->
+  <div class="c c-g">
+    <div class="ct gr">✅ General AWS Security Best Practices</div>
+    <ul class="cl">
+      <li><strong>Use IAM:</strong> users/groups/roles with least privilege</li>
+      <li><strong>Enable MFA:</strong> especially for root account</li>
+      <li><strong>Use SSL/TLS</strong> for all connections</li>
+      <li><strong>Use CloudTrail:</strong> log all API + user activity</li>
+      <li><strong>Encrypt everything:</strong> at rest + in transit</li>
+      <li><strong>Be careful with PII:</strong> mask, anonymize, or delete</li>
+      <li><strong>Never store secrets in plaintext</strong> in code!</li>
+    </ul>
+    <div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px;">SageMaker Security Summary:</div>
+    <table class="tbl">
+      <thead><tr><th>Layer</th><th>Tool</th><th>What it secures</th></tr></thead>
+      <tbody>
+        <tr><td>Identity</td><td>IAM</td><td>User/role permissions for all SageMaker API calls</td></tr>
+        <tr><td>Data at rest</td><td>KMS</td><td>Notebooks, /opt/ml/, /tmp, S3 training data, model artifacts</td></tr>
+        <tr><td>Data in transit</td><td>TLS/SSL</td><td>All SageMaker traffic. Optional inter-container encryption.</td></tr>
+        <tr><td>Network</td><td>VPC + PrivateLink</td><td>Private VPC for training. PrivateLink for S3/API without internet.</td></tr>
+        <tr><td>Monitoring</td><td>CloudWatch + CloudTrail</td><td>Metrics, logs, audit trail of API calls</td></tr>
+        <tr><td>PII</td><td>Macie</td><td>Discover + alert on PII in S3</td></tr>
+        <tr><td>Secrets</td><td>Secrets Manager</td><td>Store + rotate database credentials, API keys</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">📊 Management &amp; Governance — CloudWatch, CloudTrail, Config, X-Ray</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g4">
+
+  <!-- CloudWatch -->
+  <div class="c c-c">
+    <div class="ct cy">📈 CloudWatch</div>
+    <div style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:3px;">Metrics:</div>
+    <ul class="cl">
+      <li>Every AWS service. Variable (CPUUtilization, NetworkIn…)</li>
+      <li>Metrics → namespaces. Dimensions (instance ID, env). Timestamps.</li>
+      <li>Custom metrics (e.g., RAM)</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Logs:</div>
+    <ul class="cl">
+      <li>Log groups (app) → Log streams (instances/containers)</li>
+      <li>Expiration: 1 day to 10 years or never</li>
+      <li>Encrypted by default. KMS custom encryption optional.</li>
+      <li><strong>S3 export:</strong> takes up to 12 hours (not real-time)</li>
+      <li><strong>Subscriptions:</strong> real-time to KDS, KDF, Lambda</li>
+      <li><strong>Logs Insights:</strong> query engine, not real-time</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Alarms:</div>
+    <ul class="cl">
+      <li>States: OK, INSUFFICIENT_DATA, ALARM</li>
+      <li>Actions: Stop/Terminate/Reboot EC2, Auto Scaling, SNS</li>
+      <li>Composite Alarms: AND/OR of multiple alarms (reduce noise)</li>
+    </ul>
+    <div class="ty"><strong>SageMaker via CW:</strong> endpoint invocations, latency, node health (CPU/memory), Ground Truth worker activity.</div>
+  </div>
+
+  <!-- CloudTrail -->
+  <div class="c c-t">
+    <div class="ct tl">🔍 CloudTrail</div>
+    <ul class="cl">
+      <li>Governance, compliance, audit for AWS account</li>
+      <li><strong>Enabled by default</strong></li>
+      <li>History of events/API calls from: Console, SDK, CLI, AWS services</li>
+      <li>Logs → CloudWatch Logs or S3</li>
+      <li>Trail can apply to All Regions (default) or single region</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Event Types:</div>
+    <table class="tbl">
+      <tr><td>Management Events</td><td>Default logged. Operations on resources (IAM, EC2, CloudTrail). Read + Write events.</td></tr>
+      <tr><td>Data Events</td><td>NOT logged by default (high volume). S3 object ops, Lambda invocations.</td></tr>
+      <tr><td>Insights Events</td><td>Detect unusual activity. Analyzes write events vs baseline. Alerts to S3 + EventBridge.</td></tr>
+    </table>
+    <div style="margin-top:5px; font-size:11px;color:var(--dim);">Events retained 90 days. For longer: log to S3 + query with Athena.</div>
+    <div class="ty"><strong>Rule:</strong> Resource deleted in AWS? Investigate CloudTrail first! KMS key usage audited via CloudTrail.</div>
+  </div>
+
+  <!-- Config + X-Ray -->
+  <div class="c c-l">
+    <div class="ct lm">⚙️ AWS Config &amp; X-Ray</div>
+    <div style="font-size:11px;font-weight:700;color:var(--lime);margin-bottom:3px;">AWS Config:</div>
+    <ul class="cl">
+      <li>Audit + record <strong>configuration compliance</strong> over time</li>
+      <li>Per-region service. Can aggregate cross-region/account.</li>
+      <li>Results stored in S3. Query with Athena.</li>
+      <li>Config Rules: AWS managed (75+) or custom Lambda</li>
+      <li>Rules evaluate on: config change OR schedule</li>
+      <li><strong>Does NOT prevent actions</strong> (no deny) — only alerts</li>
+      <li>Pricing: $0.003/config item, $0.001/rule evaluation</li>
+    </ul>
+    <div style="margin-top:5px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">Config Remediations + Notifications:</div>
+    <ul class="cl">
+      <li>Auto-remediation via SSM Automation Documents</li>
+      <li>SNS notifications on non-compliance</li>
+      <li>EventBridge triggers on non-compliant resources</li>
+    </ul>
+    <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--sky);margin-bottom:3px;">AWS X-Ray:</div>
+    <ul class="cl">
+      <li>Distributed tracing for microservices debugging</li>
+      <li>End-to-end "request" tracking. Segments + sub-segments.</li>
+      <li>Visual service map. Identify bottlenecks.</li>
+      <li>Works with: Lambda, ECS, ELB, API Gateway, EC2</li>
+      <li>Import X-Ray SDK in code + install X-Ray daemon</li>
+    </ul>
+    <div class="ty"><strong>CW vs CT vs Config:</strong> CW = performance metrics + alerts. CT = API audit trail. Config = configuration compliance over time.</div>
+  </div>
+
+  <!-- Trusted Advisor + Budgets + Cost Explorer -->
+  <div class="c c-a">
+    <div class="ct am">💰 Cost, Governance &amp; Optimization</div>
+    <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:3px;">AWS Trusted Advisor:</div>
+    <ul class="cl">
+      <li>No install needed. High-level account assessment.</li>
+      <li>6 categories: Cost optimization, Performance, Security, Fault tolerance, Service limits, Operational Excellence</li>
+      <li>Business/Enterprise plans → full checks + programmatic access (Support API)</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">AWS Budgets:</div>
+    <ul class="cl">
+      <li>Create budgets + send SNS alarms when costs exceed</li>
+      <li>4 types: Usage, Cost, Reservation, Savings Plans</li>
+      <li>Up to 5 SNS notifications per budget</li>
+      <li>First 2 budgets free, then $0.02/day/budget</li>
+    </ul>
+    <div style="margin-top:6px;font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px;">AWS Cost Explorer:</div>
+    <ul class="cl">
+      <li>Visualize + analyze AWS costs over time</li>
+      <li>Monthly, hourly, resource-level granularity</li>
+      <li>Forecast up to 18 months from past usage</li>
+      <li>Recommend Savings Plans</li>
+    </ul>
+    <div class="ty"><strong>QuickSight:</strong> Business analytics + BI dashboards. SPICE (in-memory engine). ML insights: anomaly detection, forecasting, auto-narratives. Pay: $9-28/user/month depending on tier.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">⚠️ Exam Quick-Fire — Security &amp; Governance</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+  <div class="c c-y">
+    <div class="ct yl">🎯 Must-Know Facts</div>
+    <ul class="cl">
+      <li>IAM is a <strong>global service</strong> — not region-specific</li>
+      <li>Never use or share the <strong>root account</strong></li>
+      <li>Explicit DENY always <strong>wins over ALLOW</strong> in IAM policies</li>
+      <li>KMS Symmetric = AES-256. You <strong>never see the key unencrypted</strong>.</li>
+      <li>AWS Managed Key auto-rotates <strong>every 1 year</strong></li>
+      <li>Customer Managed Key rotation must be <strong>enabled</strong> (not auto)</li>
+      <li>Imported KMS Key = <strong>manual rotation only</strong> via alias</li>
+      <li>KMS cross-region copy = <strong>ReEncrypt</strong> with destination region key</li>
+      <li>Without KMS Key Policy = <strong>cannot control access to the key</strong></li>
+      <li>NACL = <strong>stateless</strong> (check both directions). SG = <strong>stateful</strong>.</li>
+      <li>VPC Peering = <strong>NOT transitive</strong> (must create separate peerings)</li>
+      <li>VPC Endpoint Gateway = S3 + DynamoDB only</li>
+      <li>PrivateLink = NLB + ENI. No peering/IGW/NAT needed.</li>
+      <li>Shield Standard = <strong>FREE</strong>, auto-enabled. Advanced = $3,000/mo.</li>
+      <li>WAF does <strong>NOT support NLB</strong> (Layer 4). ALB/API GW/CloudFront only.</li>
+      <li>CloudTrail <strong>enabled by default</strong>. Retained 90 days. Long-term → S3+Athena.</li>
+      <li>Config does <strong>NOT prevent actions</strong> — only records and alerts</li>
+      <li>Macie = PII discovery in S3 via ML + pattern matching</li>
+      <li>Secrets Manager = KMS-encrypted secrets + auto-rotation via Lambda</li>
+    </ul>
+  </div>
+  <div class="c c-r">
+    <div class="ct rd">⚠️ Common Exam Traps</div>
+    <ul class="cl">
+      <li>SageMaker notebooks are <strong>internet-enabled by default</strong> — security risk!</li>
+      <li>Network isolation in SageMaker <strong>prevents S3 access too</strong></li>
+      <li>Inter-container traffic encryption is <strong>optional</strong> in SageMaker (may slow training)</li>
+      <li>KMS API limits apply with SSE-KMS (GenerateDataKey + Decrypt calls)</li>
+      <li>WAF Web ACL = Regional EXCEPT for <strong>CloudFront (global)</strong></li>
+      <li>Shield Advanced protects against <strong>cost spikes</strong> due to DDoS — Standard doesn't</li>
+      <li>CloudTrail data events (S3 object ops, Lambda invocations) = <strong>NOT logged by default</strong></li>
+      <li>Config Rules don't prevent actions — need AWS Config Remediation + SSM for auto-fix</li>
+      <li>CW Logs S3 export = up to <strong>12 hours</strong> delay — not real-time. Use Subscriptions instead.</li>
+      <li>VPC Peering requires <strong>no overlapping CIDR</strong> ranges</li>
+      <li>Direct Connect takes <strong>at least 1 month</strong> to establish</li>
+      <li>Secrets Manager ≠ SSM Parameter Store (Secrets Manager = KMS + auto-rotation + RDS native)</li>
+      <li>IAM Access Analyzer = generates <strong>least-privilege policies</strong> from actual access patterns</li>
+      <li>MFA is recommended for ALL accounts especially root — not just root</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topics 08 & 09: Security, Identity, Compliance + Management & Governance</span>
+  <span class="pnum">8–9 / 12</span>
+</div>
+
+</body>
+</html>

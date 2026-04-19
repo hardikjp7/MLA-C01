@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 2: Data Transformation, Integrity & Feature Engineering</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #0b0f0e;
+    --surface: #121918;
+    --surface2: #1a2422;
+    --border: #1e2e2b;
+    --accent: #00e5b4;
+    --accent2: #ff8c42;
+    --accent3: #7b61ff;
+    --pink: #f471b5;
+    --green: #22c55e;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --blue: #38bdf8;
+    --text: #e2ede9;
+    --text-dim: #7fa89c;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Outfit', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 20px;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #0b120f 0%, #0e1a16 60%, #0b120f 100%);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 28px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,229,180,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .topic-num { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
+  h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--accent), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 5px 0 3px; }
+  .subtitle { color: var(--text-dim); font-size: 12px; }
+  .badge { background: var(--accent3); color: white; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; }
+
+  /* LAYOUT */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-bottom: 13px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-bottom: 13px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 13px; }
+  .full { margin-bottom: 13px; }
+  .span2 { grid-column: span 2; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 13px; }
+  .card-teal   { border-top: 3px solid var(--accent); }
+  .card-orange { border-top: 3px solid var(--accent2); }
+  .card-purple { border-top: 3px solid var(--accent3); }
+  .card-green  { border-top: 3px solid var(--green); }
+  .card-yellow { border-top: 3px solid var(--yellow); }
+  .card-red    { border-top: 3px solid var(--red); }
+  .card-blue   { border-top: 3px solid var(--blue); }
+  .card-pink   { border-top: 3px solid var(--pink); }
+
+  .ctitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 9px; display: flex; align-items: center; gap: 6px; }
+  .ctitle.teal   { color: var(--accent); }
+  .ctitle.orange { color: var(--accent2); }
+  .ctitle.purple { color: var(--accent3); }
+  .ctitle.green  { color: var(--green); }
+  .ctitle.yellow { color: var(--yellow); }
+  .ctitle.red    { color: var(--red); }
+  .ctitle.blue   { color: var(--blue); }
+  .ctitle.pink   { color: var(--pink); }
+
+  /* SECTION LABEL */
+  .sec { font-family: var(--mono); font-size: 10px; color: var(--accent3); text-transform: uppercase; letter-spacing: 3px; margin: 16px 0 9px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+
+  /* LISTS */
+  ul.cl { list-style: none; }
+  ul.cl li { padding: 2px 0 2px 15px; position: relative; color: var(--text-dim); font-size: 12px; }
+  ul.cl li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); font-size: 9px; top: 5px; }
+  ul.cl li strong { color: var(--text); }
+
+  /* TAGS */
+  .tag { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 4px; margin: 2px 2px 2px 0; }
+  .t-teal   { background: rgba(0,229,180,0.1);  color: var(--accent);  border: 1px solid rgba(0,229,180,0.2); }
+  .t-orange { background: rgba(255,140,66,0.1); color: var(--accent2); border: 1px solid rgba(255,140,66,0.2); }
+  .t-purple { background: rgba(123,97,255,0.12);color: #a78bfa;        border: 1px solid rgba(123,97,255,0.25); }
+  .t-green  { background: rgba(34,197,94,0.1);  color: var(--green);   border: 1px solid rgba(34,197,94,0.2); }
+  .t-yellow { background: rgba(251,191,36,0.1); color: var(--yellow);  border: 1px solid rgba(251,191,36,0.2); }
+  .t-red    { background: rgba(248,113,113,0.1);color: var(--red);     border: 1px solid rgba(248,113,113,0.2); }
+  .t-blue   { background: rgba(56,189,248,0.1); color: var(--blue);    border: 1px solid rgba(56,189,248,0.2); }
+  .t-pink   { background: rgba(244,113,181,0.1);color: var(--pink);    border: 1px solid rgba(244,113,181,0.2); }
+
+  /* TIP BOXES */
+  .tip-yellow { background: rgba(251,191,36,0.05); border: 1px solid rgba(251,191,36,0.18); border-left: 3px solid var(--yellow); border-radius: 5px; padding: 7px 10px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-yellow strong { color: var(--yellow); }
+  .tip-red    { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.18); border-left: 3px solid var(--red); border-radius: 5px; padding: 7px 10px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-red strong { color: var(--red); }
+  .tip-teal   { background: rgba(0,229,180,0.05); border: 1px solid rgba(0,229,180,0.18); border-left: 3px solid var(--accent); border-radius: 5px; padding: 7px 10px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-teal strong { color: var(--accent); }
+  .tip-purple { background: rgba(123,97,255,0.06); border: 1px solid rgba(123,97,255,0.2); border-left: 3px solid var(--accent3); border-radius: 5px; padding: 7px 10px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-purple strong { color: #a78bfa; }
+
+  /* TABLES */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .tbl th { background: var(--surface2); padding: 6px 9px; text-align: left; font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 5px 9px; border-bottom: 1px solid rgba(30,46,43,0.5); color: var(--text-dim); vertical-align: top; }
+  .tbl td:first-child { color: var(--text); font-weight: 600; }
+  .tbl tr:last-child td { border-bottom: none; }
+
+  /* NODE ROW */
+  .node-row { display: grid; grid-template-columns: 100px 1fr; gap: 8px; padding: 6px 0; border-bottom: 1px solid rgba(30,46,43,0.5); font-size: 12px; align-items: start; }
+  .node-row:last-child { border-bottom: none; }
+  .node-label { font-family: var(--mono); font-size: 10px; font-weight: 700; padding-top: 1px; }
+
+  /* TECHNIQUE BLOCK */
+  .tech { background: var(--surface2); border-radius: 7px; padding: 9px 11px; margin-bottom: 6px; }
+  .tech-title { font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+  .tech-desc  { font-size: 11px; color: var(--text-dim); }
+
+  /* INLINE STAT */
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(30,46,43,0.4); font-size: 11px; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-lbl { color: var(--text-dim); }
+  .stat-val { font-family: var(--mono); font-size: 10px; font-weight: 700; }
+
+  /* BIAS METRIC */
+  .bias-item { padding: 4px 0; border-bottom: 1px solid rgba(30,46,43,0.4); font-size: 11px; }
+  .bias-item:last-child { border-bottom: none; }
+  .bias-abbr { font-family: var(--mono); color: var(--pink); font-size: 10px; font-weight: 700; display: inline-block; min-width: 45px; }
+  .bias-name { color: var(--text); font-weight: 600; }
+  .bias-desc { color: var(--text-dim); font-size: 10px; }
+
+  /* FLOW */
+  .flow { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  .flow-step { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; font-size: 11px; color: var(--text); font-weight: 600; }
+  .flow-arrow { color: var(--accent); font-size: 14px; font-weight: 700; }
+
+  /* FOOTER */
+  .footer { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-dim); font-family: var(--mono); }
+  .page-num { color: var(--accent); font-weight: 700; }
+
+  @media (max-width: 900px) { .grid-3,.grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } body { padding: 10px; } h1 { font-size: 19px; } .span2 { grid-column: span 1; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="topic-num">Topic 02 of 12</div>
+      <h1>Data Transformation, Integrity &amp; Feature Engineering</h1>
+      <div class="subtitle">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="badge">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<div class="sec">🔧 Amazon EMR — Elastic MapReduce</div>
+<!-- ════════════════════════════════════════════════════ -->
+
+<div class="grid-3">
+
+  <!-- EMR Overview -->
+  <div class="card card-teal">
+    <div class="ctitle teal">🗂 EMR Overview</div>
+    <ul class="cl">
+      <li>Managed <strong>Hadoop framework</strong> on EC2 instances</li>
+      <li>Includes <strong>Spark, HBase, Presto, Flink, Hive</strong></li>
+      <li>EMR Notebooks, multiple AWS integrations</li>
+      <li>Charges by the hour <strong>+ EC2 charges</strong></li>
+      <li>Provisions new nodes if core node fails</li>
+      <li>Add/remove task nodes on the fly</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; color:var(--text-dim); font-weight:700; margin-bottom:4px;">Storage Options:</div>
+    <ul class="cl">
+      <li><strong>HDFS</strong> — native Hadoop distributed FS</li>
+      <li><strong>EMRFS</strong> — access S3 as if it were HDFS (uses DynamoDB for consistency)</li>
+      <li><strong>EBS</strong> for HDFS, local file system</li>
+    </ul>
+    <div class="tip-teal"><strong>Security:</strong> IAM policies, Kerberos, SSH, IAM roles, Lake Formation integration, Apache Ranger (data security on Hadoop/Hive)</div>
+  </div>
+
+  <!-- EMR Cluster Nodes -->
+  <div class="card card-orange">
+    <div class="ctitle orange">🖥 EMR Cluster Nodes</div>
+    <div class="node-row">
+      <div class="node-label" style="color:var(--accent)">Master Node</div>
+      <div style="color:var(--text-dim); font-size:12px;">Manages the cluster. Single EC2 instance.<br><span class="tag t-teal">m4.large (&lt;50 nodes)</span> <span class="tag t-teal">m4.xlarge (&gt;50)</span></div>
+    </div>
+    <div class="node-row">
+      <div class="node-label" style="color:var(--yellow)">Core Node</div>
+      <div style="color:var(--text-dim); font-size:12px;">Hosts HDFS data + runs tasks. Can scale <strong>with some risk</strong>. Don't use Spot here (data loss risk).</div>
+    </div>
+    <div class="node-row">
+      <div class="node-label" style="color:var(--green)">Task Node</div>
+      <div style="color:var(--text-dim); font-size:12px;">Runs tasks only, <strong>NO data hosting</strong>. Safe to remove. <strong>Best use for Spot instances!</strong></div>
+    </div>
+    <div style="margin-top:9px; font-size:11px; color:var(--text-dim); font-weight:700; margin-bottom:5px;">Instance Type Guide:</div>
+    <table class="tbl">
+      <tr><td>ML / NLP</td><td>Cluster compute instances</td></tr>
+      <tr><td>AI / Deep Learning</td><td>GPU: g3, g4, p2, p3</td></tr>
+      <tr><td>Compute-heavy</td><td>High CPU instances</td></tr>
+      <tr><td>Memory caching</td><td>High memory instances</td></tr>
+    </table>
+  </div>
+
+  <!-- EMR Serverless -->
+  <div class="card card-purple">
+    <div class="ctitle purple">☁️ EMR Serverless</div>
+    <ul class="cl">
+      <li>Choose runtime: <strong>Spark, Hive, Presto</strong></li>
+      <li>Submit job run requests — EMR manages capacity</li>
+      <li>Specify default worker sizes + pre-initialized capacity</li>
+      <li>All within one region, across multiple AZs</li>
+      <li><strong>Spark adds 10% memory overhead</strong> for drivers &amp; executors → pre-initialize at least 10% more</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; color:var(--accent3); font-weight:700; margin-bottom:4px;">Lifecycle (not all automatic!):</div>
+    <div class="flow">
+      <div class="flow-step">Creating</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Created</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Starting</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Started</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Stopping</div><div class="flow-arrow">→</div>
+      <div class="flow-step">Terminated</div>
+    </div>
+    <div class="tip-red"><strong>⚠️ Cost Trap:</strong> Must call <code>DeleteApplication</code> to avoid excess charges! Also: <strong>EMR on EKS</strong> — submit Spark jobs on EKS without provisioning clusters.</div>
+  </div>
+</div>
+
+<!-- Apache Spark -->
+<div class="grid-2">
+  <div class="card card-green">
+    <div class="ctitle green">⚡ Apache Spark on EMR</div>
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">Spark replaces MapReduce — processes in-memory, much faster for iterative ML workloads.</div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Spark Components:</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+      <span class="tag t-green">Spark Core</span>
+      <span class="tag t-green">Spark SQL</span>
+      <span class="tag t-green">Spark Streaming</span>
+      <span class="tag t-green">MLLib</span>
+      <span class="tag t-green">GraphX</span>
+    </div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Spark MLLib Algorithms:</div>
+    <ul class="cl">
+      <li>Classification: logistic regression, naïve Bayes</li>
+      <li>Regression, Decision trees</li>
+      <li>Recommendation engine (<strong>ALS</strong>)</li>
+      <li>Clustering (<strong>K-Means</strong>), LDA (topic modeling)</li>
+      <li>SVD, PCA, statistics, ML workflow pipelines</li>
+    </ul>
+    <div class="tip-teal"><strong>Spark + Kinesis:</strong> Use KCL to build Spark Dataset from Kinesis streams. <strong>Zeppelin/EMR Notebooks</strong> = interactive Spark exploration with SQL + visualizations.</div>
+  </div>
+
+  <div class="card card-blue">
+    <div class="ctitle blue">🔍 AWS Glue — Serverless ETL</div>
+    <ul class="cl">
+      <li><strong>Glue Crawler:</strong> Scans S3, creates schema → populates <strong>Glue Data Catalog</strong>. Runs periodically. Data stays in S3.</li>
+      <li><strong>Data Catalog:</strong> Once cataloged → query via Athena, Redshift Spectrum, EMR, QuickSight</li>
+      <li><strong>Glue Studio:</strong> Visual DAG editor for ETL. Sources: S3, Kinesis, Kafka, JDBC</li>
+      <li><strong>Glue Data Quality:</strong> Rules via DQDL. Auto-recommended rules. Can fail the job or report to CloudWatch.</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">S3 Partition Strategy (critical for performance!):</div>
+    <table class="tbl">
+      <thead><tr><th>Query pattern</th><th>Organize as</th></tr></thead>
+      <tbody>
+        <tr><td>By time range</td><td style="font-family:var(--mono); font-size:10px;">yyyy/mm/dd/device</td></tr>
+        <tr><td>By device</td><td style="font-family:var(--mono); font-size:10px;">device/yyyy/mm/dd</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-yellow"><strong>⚡ Exam:</strong> Glue = ETL + Data Catalog. Athena = querying. Don't use Athena for ETL — use Glue instead.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<div class="sec">🧪 AWS Glue DataBrew &amp; Amazon Athena</div>
+<!-- ════════════════════════════════════════════════════ -->
+
+<div class="grid-2">
+  <div class="card card-pink">
+    <div class="ctitle pink">🍳 AWS Glue DataBrew</div>
+    <ul class="cl">
+      <li>Visual data preparation tool — <strong>no code needed</strong></li>
+      <li>Input: S3, data warehouse, database → Output: S3</li>
+      <li><strong>250+ ready-made transformations</strong></li>
+      <li>Create <strong>"recipes"</strong> = reusable transformation jobs</li>
+      <li>Custom SQL datasets from Redshift &amp; Snowflake</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">PII Handling Transformations:</div>
+    <div style="display:flex; flex-wrap:wrap; gap:3px;">
+      <span class="tag t-red">REPLACE_WITH_RANDOM</span>
+      <span class="tag t-red">SHUFFLE_ROWS</span>
+      <span class="tag t-red">DETERMINISTIC_ENCRYPT</span>
+      <span class="tag t-red">ENCRYPT</span>
+      <span class="tag t-red">DECRYPT</span>
+      <span class="tag t-red">DELETE</span>
+      <span class="tag t-red">MASK_CUSTOM</span>
+      <span class="tag t-red">CRYPTOGRAPHIC_HASH</span>
+    </div>
+    <div class="tip-yellow"><strong>Security:</strong> KMS (customer master keys only), SSL in transit, IAM, CloudWatch &amp; CloudTrail.</div>
+  </div>
+
+  <div class="card card-teal">
+    <div class="ctitle teal">🔍 Amazon Athena</div>
+    <ul class="cl">
+      <li>Serverless <strong>interactive SQL queries</strong> on S3 data</li>
+      <li><strong>Presto</strong> under the hood. Data stays in S3.</li>
+      <li>Formats: CSV, TSV, JSON, <strong>ORC, Parquet</strong>, Avro</li>
+      <li>Compression: Snappy, Zlib, LZO, Gzip</li>
+      <li>Cost: <strong>$5 per TB scanned</strong>. DDL is free. Failed queries not charged.</li>
+      <li><strong>Save 30–90%</strong> cost using columnar formats (ORC, Parquet)</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">ACID Transactions (Apache Iceberg):</div>
+    <ul class="cl">
+      <li>Add <code>table_type = 'ICEBERG'</code> to CREATE TABLE</li>
+      <li>Concurrent row-level modifications, time travel queries</li>
+      <li>Use <code>OPTIMIZE table REWRITE DATA USING BIN_PACK</code> for compaction</li>
+    </ul>
+    <div style="margin-top:6px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Performance Optimization:</div>
+    <ul class="cl">
+      <li>Use columnar data (ORC/Parquet)</li>
+      <li>Fewer large files &gt; many small files</li>
+      <li>Use partitions. After adding: <code>MSCK REPAIR TABLE</code></li>
+    </ul>
+    <div class="tip-red"><strong>Anti-patterns:</strong> Athena ≠ formatted reports (use QuickSight), Athena ≠ ETL (use Glue). CTAS trick: use <code>CREATE TABLE AS SELECT</code> to convert CSV→Parquet in S3.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<div class="sec">🎛 Feature Engineering — Core Techniques</div>
+<!-- ════════════════════════════════════════════════════ -->
+
+<div class="grid-2">
+
+  <!-- Missing Data -->
+  <div class="card card-yellow">
+    <div class="ctitle yellow">❓ Handling Missing Data</div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--text-dim)">Mean/Median Replacement</div>
+      <div class="tech-desc">Replace with column mean or median. Fast &amp; easy. Use <strong>median for outlier-heavy data</strong>. ❌ Misses correlations, can't use on categorical features.</div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--text-dim)">Dropping Rows</div>
+      <div class="tech-desc">Only if few rows affected &amp; won't bias data. Quick but NOT the "best" answer for exam questions. Almost anything is better.</div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--green)">KNN Imputation</div>
+      <div class="tech-desc">Find K nearest rows, average their values. Numerical data only. Can use Hamming distance for categorical.</div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--blue)">Deep Learning / Regression</div>
+      <div class="tech-desc">Build a model to impute for your model! Works well for categorical. Advanced: <strong>MICE</strong> (Multiple Imputation by Chained Equations).</div>
+    </div>
+
+    <div class="tip-yellow"><strong>Best answer:</strong> Get more real data! KNN or Deep Learning = best imputation. Mean replacement = simplest but least accurate.</div>
+  </div>
+
+  <!-- Unbalanced Data -->
+  <div class="card card-orange">
+    <div class="ctitle orange">⚖️ Handling Unbalanced Data</div>
+    <div style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">Large discrepancy between positive/negative cases. e.g., fraud detection — mainly a problem with neural networks.</div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--text-dim)">Oversampling</div>
+      <div class="tech-desc">Duplicate samples from the minority class. Simple but can cause overfitting.</div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--text-dim)">Undersampling</div>
+      <div class="tech-desc">Remove samples from majority class. Discards data — not ideal unless avoiding big data scaling issues.</div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--green)">SMOTE ⭐</div>
+      <div class="tech-desc"><strong>Synthetic Minority Over-sampling TEchnique.</strong> Generates new samples using KNN (mean of neighbors). Also undersamples majority class. <strong>Better than just oversampling.</strong></div>
+    </div>
+
+    <div class="tech">
+      <div class="tech-title" style="color:var(--blue)">Adjust Threshold</div>
+      <div class="tech-desc">Increase classification threshold → reduces false positives but increases false negatives. Trade-off decision.</div>
+    </div>
+
+    <div class="tip-teal"><strong>Data Wrangler</strong> supports: Random oversampling, undersampling, SMOTE — all built-in!</div>
+  </div>
+</div>
+
+<!-- Transformations Row -->
+<div class="grid-4">
+
+  <div class="card card-teal">
+    <div class="ctitle teal">📊 Outliers</div>
+    <ul class="cl">
+      <li><strong>Variance (σ²):</strong> Avg of squared differences from mean</li>
+      <li><strong>Std Dev (σ):</strong> √variance. Data &gt;1σ from mean = unusual</li>
+      <li>"How many sigmas away" = how extreme</li>
+      <li>Remove outliers <strong>responsibly</strong> — understand WHY</li>
+    </ul>
+    <div class="tip-yellow"><strong>AWS tool:</strong> Random Cut Forest detects outliers in QuickSight, Kinesis Analytics, SageMaker</div>
+  </div>
+
+  <div class="card card-purple">
+    <div class="ctitle purple">📦 Binning &amp; Encoding</div>
+    <ul class="cl">
+      <li><strong>Binning:</strong> Group values into ranges (20s, 30s, 40s...). Numeric → ordinal. Useful when measurements have uncertainty.</li>
+      <li><strong>Quantile binning:</strong> Ensures equal-size bins</li>
+      <li><strong>One-Hot Encoding:</strong> Category → binary vector. Column per category, 1 for match, 0 elsewhere. Common in deep learning.</li>
+    </ul>
+    <div class="tip-teal"><strong>Use when:</strong> Model needs categorical data as numbers. Prevents ordinal bias.</div>
+  </div>
+
+  <div class="card card-green">
+    <div class="ctitle green">📐 Scaling &amp; Transforming</div>
+    <ul class="cl">
+      <li><strong>Normalization:</strong> Scale features to 0–1 or around 0. Required for neural nets. Use <code>MinMaxScaler</code> in scikit-learn.</li>
+      <li><strong>Why scale?</strong> Prevents larger-magnitude features from dominating (e.g., age vs. income)</li>
+      <li><strong>Log transform:</strong> For exponential-trending data</li>
+      <li><strong>x, x², √x:</strong> Allows learning super/sub-linear functions (YouTube recommendation technique)</li>
+      <li><strong>Shuffling:</strong> Removes residual order signals from training data</li>
+    </ul>
+  </div>
+
+  <div class="card card-red">
+    <div class="ctitle red">🌀 Dimensionality</div>
+    <ul class="cl">
+      <li><strong>Curse of Dimensionality:</strong> Too many features → sparse data → poor model performance</li>
+      <li>Each feature = a new dimension</li>
+      <li><strong>Dimensionality Reduction:</strong></li>
+      <li><strong>PCA</strong> — projects to fewer dimensions while preserving variance</li>
+      <li><strong>K-Means</strong> — clusters features together</li>
+      <li><strong>TF-IDF:</strong> Term Frequency × Inverse Document Frequency. Measures word importance in a doc relative to all docs. Use log(IDF).</li>
+      <li>N-grams: unigrams, bigrams, trigrams for richer text features</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════ -->
+<div class="sec">🧠 SageMaker Data Processing Tools</div>
+<!-- ════════════════════════════════════════════════════ -->
+
+<div class="grid-3">
+
+  <!-- Data Wrangler -->
+  <div class="card card-teal">
+    <div class="ctitle teal">🪄 SageMaker Data Wrangler</div>
+    <ul class="cl">
+      <li>Visual interface in <strong>SageMaker Studio</strong></li>
+      <li>Import → Visualize → Transform → Model → Export</li>
+      <li><strong>300+ built-in transformations</strong></li>
+      <li>Custom transforms via pandas, PySpark, PySpark SQL</li>
+      <li><strong>Quick Model:</strong> Train model on prepared data, measure results</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Data Sources:</div>
+    <div><span class="tag t-teal">S3</span><span class="tag t-teal">Athena</span><span class="tag t-teal">Redshift</span><span class="tag t-teal">Lake Formation</span><span class="tag t-teal">Feature Store</span><span class="tag t-teal">JDBC (Databricks)</span></div>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Notable capabilities:</div>
+    <ul class="cl">
+      <li>Image transformations (resize, enhance, corrupt)</li>
+      <li>Balance data: oversampling, undersampling, <strong>SMOTE</strong></li>
+      <li>Impute missing data, handle outliers, <strong>PCA</strong></li>
+    </ul>
+    <div class="tip-red"><strong>Troubleshoot:</strong> IAM role needs <code>AmazonSageMakerFullAccess</code>. "Instance not available" → request quota increase (ml.m5.4xlarge).</div>
+  </div>
+
+  <!-- Ground Truth -->
+  <div class="card card-orange">
+    <div class="ctitle orange">🏷 SageMaker Ground Truth</div>
+    <ul class="cl">
+      <li>Manages humans who label training data</li>
+      <li>Builds its own model as labeling progresses</li>
+      <li>Only ambiguous items sent to humans → <strong>reduces cost by 70%</strong></li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Labeler Options:</div>
+    <ul class="cl">
+      <li><strong>Mechanical Turk</strong> — crowdsourced workforce</li>
+      <li><strong>Internal team</strong> — your own employees</li>
+      <li><strong>Professional companies</strong> — vetted labelers</li>
+      <li><strong>Ground Truth Plus</strong> — AWS-managed turnkey solution</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Auto-labeling alternatives:</div>
+    <ul class="cl">
+      <li><strong>Rekognition</strong> — auto classify images</li>
+      <li><strong>Comprehend</strong> — auto classify text/sentiment</li>
+      <li>Any pre-trained or unsupervised model</li>
+    </ul>
+    <div class="tip-teal"><strong>Amazon Mechanical Turk:</strong> $0.10/image reward example. Integrates with A2I + Ground Truth. Use cases: image classification, data collection.</div>
+  </div>
+
+  <!-- Feature Store -->
+  <div class="card card-purple">
+    <div class="ctitle purple">🗃 SageMaker Feature Store</div>
+    <ul class="cl">
+      <li>Central repository for ML features — organized, shareable, fast access</li>
+      <li>Organized into <strong>Feature Groups</strong> (Record ID + Feature Name + Event Time)</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Two Store Types:</div>
+    <table class="tbl">
+      <thead><tr><th>Store</th><th>Access</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>Online Store</td><td>PutRecord / GetRecord API (streaming)</td><td>Real-time inference (low latency)</td></tr>
+        <tr><td>Offline Store (S3)</td><td>Athena, Data Wrangler (batch)</td><td>Training. Auto-creates Glue Data Catalog.</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Ingestion sources:</div>
+    <div><span class="tag t-purple">Kinesis</span><span class="tag t-purple">MSK / Kafka</span><span class="tag t-purple">Spark</span><span class="tag t-purple">Data Wrangler</span></div>
+    <div class="tip-teal"><strong>Security:</strong> Encrypted at rest + in transit, KMS customer master keys, IAM fine-grained control, PrivateLink supported.</div>
+  </div>
+</div>
+
+<!-- SageMaker Model Monitor + Clarify -->
+<div class="grid-2">
+
+  <div class="card card-blue">
+    <div class="ctitle blue">📡 SageMaker Model Monitor</div>
+    <ul class="cl">
+      <li>Alerts on quality deviations via <strong>CloudWatch</strong></li>
+      <li>No code needed. Monitoring Schedule → CloudWatch metrics</li>
+      <li>Integrates with TensorBoard, QuickSight, Tableau, SageMaker Studio</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Monitoring Types:</div>
+    <table class="tbl">
+      <thead><tr><th>Type</th><th>What it detects</th></tr></thead>
+      <tbody>
+        <tr><td>Data Quality Drift</td><td>Statistical property changes vs baseline</td></tr>
+        <tr><td>Model Quality Drift</td><td>Accuracy drop vs baseline. Can use Ground Truth labels.</td></tr>
+        <tr><td>Bias Drift</td><td>New bias emerging in predictions</td></tr>
+        <tr><td>Feature Attribution Drift</td><td>NDCG score: training vs live feature rankings</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-yellow"><strong>Data Capture:</strong> Logs endpoint inputs/outputs to S3 as JSON. Used for retraining, debugging, monitoring. Works for real-time and batch.</div>
+  </div>
+
+  <div class="card card-pink">
+    <div class="ctitle pink">⚖️ SageMaker Clarify — Bias &amp; Explainability</div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Pre-training Bias Metrics:</div>
+    <div class="bias-item"><span class="bias-abbr">CI</span> <span class="bias-name">Class Imbalance</span><br><span class="bias-desc">One demographic group has fewer training values</span></div>
+    <div class="bias-item"><span class="bias-abbr">DPL</span> <span class="bias-name">Diff. in Proportions of Labels</span><br><span class="bias-desc">Imbalance of positive outcomes between facets</span></div>
+    <div class="bias-item"><span class="bias-abbr">KL/JS</span> <span class="bias-name">Kullback-Leibler / Jensen-Shannon</span><br><span class="bias-desc">How much outcome distributions of facets diverge</span></div>
+    <div class="bias-item"><span class="bias-abbr">KS</span> <span class="bias-name">Kolmogorov-Smirnov</span><br><span class="bias-desc">Maximum divergence between outcome distributions</span></div>
+    <div class="bias-item"><span class="bias-abbr">TVD</span> <span class="bias-name">Total Variation Distance</span><br><span class="bias-desc">L1-norm difference between outcome distributions</span></div>
+    <div class="bias-item"><span class="bias-abbr">CDD</span> <span class="bias-name">Conditional Demographic Disparity</span><br><span class="bias-desc">Disparity of outcomes by subgroups</span></div>
+    <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Explainability Tools:</div>
+    <ul class="cl">
+      <li><strong>SHAP</strong> (Shapley Additive exPlanations): measures impact of dropping each feature. Originated in game theory.</li>
+      <li><strong>Asymmetric Shapley Values</strong>: for time series — contribution per time step</li>
+      <li><strong>PDPs</strong> (Partial Dependence Plots): shows how feature values influence predictions</li>
+    </ul>
+    <div class="tip-teal"><strong>Model Monitor + Clarify:</strong> Monitors for bias drift + alerts via CloudWatch when new bias emerges in deployed model.</div>
+  </div>
+</div>
+
+<!-- SageMaker Canvas + Processing -->
+<div class="grid-2">
+  <div class="card card-green">
+    <div class="ctitle green">🖼 SageMaker Processing &amp; Canvas</div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">SageMaker Processing Jobs:</div>
+    <ul class="cl">
+      <li>Copy data from S3 → spin up processing container → output to S3</li>
+      <li>Use built-in or custom containers</li>
+      <li>Ideal format: <strong>RecordIO / Protobuf</strong></li>
+      <li>Can ingest from Athena, EMR, Redshift, Amazon Keyspaces</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">SageMaker Canvas (No-code ML):</div>
+    <ul class="cl">
+      <li>For business analysts — upload CSV, pick column to predict, build &amp; predict</li>
+      <li>Automatic data cleaning: missing values, outliers, duplicates</li>
+      <li>Classification or regression only</li>
+      <li>GenAI support via Bedrock / JumpStart</li>
+      <li>Share models &amp; datasets with SageMaker Studio</li>
+    </ul>
+    <div class="tip-yellow"><strong>⚡ Exam:</strong> Canvas = no-code ML for business analysts (CSV only currently). Processing jobs = scripted data prep with containers.</div>
+  </div>
+
+  <div class="card card-orange">
+    <div class="ctitle orange">🎯 Exam Quick-Fire</div>
+    <ul class="cl">
+      <li><strong>EMR Task Node</strong> = best for Spot instances (no data loss risk)</li>
+      <li><strong>EMR Core Node</strong> = don't use Spot (risk partial data loss)</li>
+      <li><strong>SMOTE</strong> = best for imbalanced data (better than just oversampling)</li>
+      <li><strong>MICE</strong> = most advanced missing data imputation</li>
+      <li><strong>One-Hot Encoding</strong> = categorical → binary vector for deep learning</li>
+      <li><strong>SHAP</strong> = SageMaker Clarify uses this for feature attribution</li>
+      <li><strong>Ground Truth</strong> = 70% cost reduction via active learning</li>
+      <li><strong>Feature Store Online</strong> = real-time inference, <strong>Offline</strong> = training</li>
+      <li><strong>Athena CTAS</strong> = convert CSV→Parquet/ORC directly in S3</li>
+      <li><strong>Glue Crawler</strong> = populates Data Catalog (schema discovery)</li>
+      <li><strong>DataBrew</strong> = 250+ transforms + PII masking (visual, no-code)</li>
+      <li><strong>Random Cut Forest</strong> = outlier detection (QuickSight, Kinesis Analytics, SageMaker)</li>
+    </ul>
+    <div class="tip-red"><strong>⚠️ Traps:</strong> Athena = query tool, NOT ETL. Glue = ETL tool. DataBrew PII = Nulling/Masking/Hashing available. Model Monitor does NOT need code. Spark adds 10% memory overhead in EMR Serverless. <code>DeleteApplication</code> required to stop billing.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 02: Data Transformation, Integrity &amp; Feature Engineering</span>
+  <span class="page-num">2 / 12</span>
+</div>
+
+</body>
+</html>

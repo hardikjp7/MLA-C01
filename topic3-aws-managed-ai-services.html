@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 3: AWS Managed AI Services</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #09090f;
+    --surface: #10101a;
+    --surface2: #16162a;
+    --border: #1e1e38;
+    --cyan: #22d3ee;
+    --violet: #8b5cf6;
+    --pink: #ec4899;
+    --orange: #f97316;
+    --green: #4ade80;
+    --yellow: #facc15;
+    --red: #f87171;
+    --blue: #60a5fa;
+    --lime: #a3e635;
+    --text: #e2e8f0;
+    --text-dim: #6b7280;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 13px; line-height: 1.5; padding: 20px; }
+
+  /* HEADER */
+  .header { background: linear-gradient(135deg, #09090f, #12102a, #09090f); border: 1px solid var(--violet); border-radius: 12px; padding: 20px 28px; margin-bottom: 18px; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%); pointer-events: none; }
+  .hrow { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .tnum { font-family: var(--mono); font-size: 11px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
+  h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--violet), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 5px 0 3px; }
+  .sub { color: var(--text-dim); font-size: 12px; }
+  .badge { background: var(--violet); color: white; font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; }
+
+  /* GRID */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+  .g4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px; }
+  .full { margin-bottom: 12px; }
+
+  /* SERVICE CARD */
+  .svc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+  .svc-cyan   { border-top: 3px solid var(--cyan); }
+  .svc-violet { border-top: 3px solid var(--violet); }
+  .svc-pink   { border-top: 3px solid var(--pink); }
+  .svc-orange { border-top: 3px solid var(--orange); }
+  .svc-green  { border-top: 3px solid var(--green); }
+  .svc-yellow { border-top: 3px solid var(--yellow); }
+  .svc-red    { border-top: 3px solid var(--red); }
+  .svc-blue   { border-top: 3px solid var(--blue); }
+  .svc-lime   { border-top: 3px solid var(--lime); }
+
+  .stitle { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .stitle.cyan   { color: var(--cyan); }
+  .stitle.violet { color: var(--violet); }
+  .stitle.pink   { color: var(--pink); }
+  .stitle.orange { color: var(--orange); }
+  .stitle.green  { color: var(--green); }
+  .stitle.yellow { color: var(--yellow); }
+  .stitle.red    { color: var(--red); }
+  .stitle.blue   { color: var(--blue); }
+  .stitle.lime   { color: var(--lime); }
+
+  /* SERVICE BADGE */
+  .svc-name { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 5px; margin-bottom: 7px; }
+  .nm-cyan   { background: rgba(34,211,238,0.12);  color: var(--cyan);   border: 1px solid rgba(34,211,238,0.25); }
+  .nm-violet { background: rgba(139,92,246,0.12); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.25); }
+  .nm-pink   { background: rgba(236,72,153,0.12);  color: var(--pink);   border: 1px solid rgba(236,72,153,0.25); }
+  .nm-orange { background: rgba(249,115,22,0.12);  color: var(--orange); border: 1px solid rgba(249,115,22,0.25); }
+  .nm-green  { background: rgba(74,222,128,0.1);   color: var(--green);  border: 1px solid rgba(74,222,128,0.2); }
+  .nm-yellow { background: rgba(250,204,21,0.1);   color: var(--yellow); border: 1px solid rgba(250,204,21,0.2); }
+  .nm-red    { background: rgba(248,113,113,0.1);  color: var(--red);    border: 1px solid rgba(248,113,113,0.2); }
+  .nm-blue   { background: rgba(96,165,250,0.1);   color: var(--blue);   border: 1px solid rgba(96,165,250,0.2); }
+  .nm-lime   { background: rgba(163,230,53,0.1);   color: var(--lime);   border: 1px solid rgba(163,230,53,0.2); }
+
+  /* LIST */
+  ul.cl { list-style: none; }
+  ul.cl li { padding: 2px 0 2px 14px; position: relative; color: var(--text-dim); font-size: 12px; }
+  ul.cl li::before { content: '▸'; position: absolute; left: 0; color: var(--cyan); font-size: 9px; top: 5px; }
+  ul.cl li strong { color: var(--text); }
+
+  /* SECTION LABEL */
+  .sec { font-family: var(--mono); font-size: 10px; color: var(--violet); text-transform: uppercase; letter-spacing: 3px; margin: 16px 0 9px; padding-bottom: 5px; border-bottom: 1px solid var(--border); }
+
+  /* TIP */
+  .tip-y  { background: rgba(250,204,21,0.05); border: 1px solid rgba(250,204,21,0.15); border-left: 3px solid var(--yellow); border-radius: 5px; padding: 6px 9px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-y strong { color: var(--yellow); }
+  .tip-r  { background: rgba(248,113,113,0.05); border: 1px solid rgba(248,113,113,0.15); border-left: 3px solid var(--red); border-radius: 5px; padding: 6px 9px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-r strong { color: var(--red); }
+  .tip-c  { background: rgba(34,211,238,0.05); border: 1px solid rgba(34,211,238,0.15); border-left: 3px solid var(--cyan); border-radius: 5px; padding: 6px 9px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-c strong { color: var(--cyan); }
+  .tip-g  { background: rgba(74,222,128,0.05); border: 1px solid rgba(74,222,128,0.15); border-left: 3px solid var(--green); border-radius: 5px; padding: 6px 9px; font-size: 11px; color: var(--text-dim); margin-top: 7px; }
+  .tip-g strong { color: var(--green); }
+
+  /* TABLE */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .tbl th { background: var(--surface2); padding: 5px 8px; text-align: left; font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .tbl td { padding: 5px 8px; border-bottom: 1px solid rgba(30,30,56,0.6); color: var(--text-dim); vertical-align: top; font-size: 11px; }
+  .tbl td:first-child { color: var(--text); font-weight: 600; }
+  .tbl tr:last-child td { border-bottom: none; }
+
+  /* TAG */
+  .tag { display: inline-block; font-family: var(--mono); font-size: 10px; padding: 2px 7px; border-radius: 4px; margin: 2px 2px 2px 0; }
+  .t-c { background: rgba(34,211,238,0.1);  color: var(--cyan);   border: 1px solid rgba(34,211,238,0.2); }
+  .t-v { background: rgba(139,92,246,0.12); color: #c4b5fd;       border: 1px solid rgba(139,92,246,0.25); }
+  .t-g { background: rgba(74,222,128,0.1);  color: var(--green);  border: 1px solid rgba(74,222,128,0.2); }
+  .t-o { background: rgba(249,115,22,0.1);  color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+  .t-p { background: rgba(236,72,153,0.1);  color: var(--pink);   border: 1px solid rgba(236,72,153,0.2); }
+  .t-y { background: rgba(250,204,21,0.1);  color: var(--yellow); border: 1px solid rgba(250,204,21,0.2); }
+  .t-b { background: rgba(96,165,250,0.1);  color: var(--blue);   border: 1px solid rgba(96,165,250,0.2); }
+  .t-r { background: rgba(248,113,113,0.1); color: var(--red);    border: 1px solid rgba(248,113,113,0.2); }
+
+  /* RECIPE ROW */
+  .recipe { padding: 4px 0; border-bottom: 1px solid rgba(30,30,56,0.5); font-size: 11px; }
+  .recipe:last-child { border-bottom: none; }
+  .recipe-type { font-family: var(--mono); font-size: 10px; color: var(--violet); font-weight: 700; }
+  .recipe-name { color: var(--text); font-weight: 600; font-size: 11px; }
+  .recipe-ex   { color: var(--text-dim); font-size: 10px; }
+
+  /* FOOTER */
+  .footer { margin-top: 18px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: var(--text-dim); font-family: var(--mono); }
+  .pnum { color: var(--cyan); font-weight: 700; }
+
+  @media (max-width: 900px) { .g3,.g4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .g2,.g3,.g4 { grid-template-columns: 1fr; } body { padding: 10px; } h1 { font-size: 18px; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="hrow">
+    <div>
+      <div class="tnum">Topic 03 of 12</div>
+      <h1>AWS Managed AI Services</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="badge">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">📝 Text & Language Services</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Comprehend -->
+  <div class="svc svc-cyan">
+    <div class="stitle cyan">🧠 NLP</div>
+    <div class="svc-name nm-cyan">Amazon Comprehend</div>
+    <ul class="cl">
+      <li>Fully managed, serverless NLP service</li>
+      <li>Detects: language, key phrases, entities, sentiment, PII</li>
+      <li>Tokenization + parts of speech analysis</li>
+      <li>Auto-organizes text into topics</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Custom Models:</div>
+    <ul class="cl">
+      <li><strong>Custom Classification:</strong> Organize docs into YOUR categories. Supports text, PDF, Word, images. Real-time (single doc) or Async (batch).</li>
+      <li><strong>Custom Entity Recognition (NER):</strong> Extract specific terms (policy numbers, escalation phrases). Train with your own data. Real-time or Async.</li>
+      <li><strong>Model versioning</strong> managed by Comprehend. Can copy models cross-account (same region, need ARN + KMS key).</li>
+    </ul>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Comprehend = NLP insights. Custom NER = business-specific entity extraction. Custom Classification = your own document categories.</div>
+  </div>
+
+  <!-- Translate + Transcribe -->
+  <div class="svc svc-violet">
+    <div class="stitle violet">🌐 Translation &amp; Speech-to-Text</div>
+    <div class="svc-name nm-violet">Amazon Translate</div>
+    <ul class="cl">
+      <li>Natural language translation at scale</li>
+      <li>Localize websites, apps for international users</li>
+      <li>Translate large volumes of text efficiently</li>
+    </ul>
+    <div style="margin-top:9px;">
+      <div class="svc-name nm-violet">Amazon Transcribe</div>
+    </div>
+    <ul class="cl">
+      <li>Speech → Text via <strong>ASR (Automatic Speech Recognition)</strong></li>
+      <li>Auto-removes PII via <strong>Redaction</strong></li>
+      <li>Automatic Language Identification (multi-lingual audio)</li>
+      <li><strong>Toxicity Detection:</strong> 7 categories: sexual harassment, hate speech, threat, abuse, profanity, insult, graphic</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Improving Transcribe Accuracy:</div>
+    <table class="tbl">
+      <thead><tr><th>Tool</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Custom Vocabularies</td><td>Specific words, brand names, acronyms, pronunciation hints</td></tr>
+        <tr><td>Custom Language Models</td><td>Domain-specific context (large volumes of domain speech)</td></tr>
+        <tr><td>Both together</td><td>Highest accuracy ⭐</td></tr>
+      </tbody>
+    </table>
+    <div class="tip-c"><strong>Use cases:</strong> Customer service transcription, closed captioning, searchable media archives.</div>
+  </div>
+
+  <!-- Polly + Textract -->
+  <div class="svc svc-pink">
+    <div class="stitle pink">🔊 Text-to-Speech &amp; OCR</div>
+    <div class="svc-name nm-pink">Amazon Polly</div>
+    <ul class="cl">
+      <li>Turn text into lifelike speech using deep learning</li>
+      <li><strong>Lexicons:</strong> Define how to read specific text (AWS → "Amazon Web Services")</li>
+      <li><strong>SSML:</strong> Markup to control pronunciation ("Hello, &lt;break&gt; how are you?")</li>
+      <li><strong>Voice engines:</strong> generative, long-form, neural, standard</li>
+      <li><strong>Speech marks:</strong> Encode word/sentence start+end positions for lip-sync or word highlighting</li>
+    </ul>
+    <div style="margin-top:9px;">
+      <div class="svc-name nm-pink">Amazon Textract</div>
+    </div>
+    <ul class="cl">
+      <li>Extracts text, handwriting, data from <strong>scanned documents</strong></li>
+      <li>Extracts from forms AND tables</li>
+      <li>Supports: PDFs, images, and more</li>
+    </ul>
+    <div style="margin-top:5px; font-size:11px; color:var(--text-dim); margin-bottom:3px; font-weight:600;">Use Cases:</div>
+    <div><span class="tag t-p">Financial invoices</span><span class="tag t-p">Medical records</span><span class="tag t-p">Tax forms</span><span class="tag t-p">ID documents</span><span class="tag t-p">Passports</span></div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Polly = text → speech. Textract = document → structured data (forms + tables). Polly SSML = fine-grained speech control.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">👁 Vision, Search & Conversation</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Rekognition -->
+  <div class="svc svc-orange">
+    <div class="stitle orange">📸 Computer Vision</div>
+    <div class="svc-name nm-orange">Amazon Rekognition</div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Capabilities:</div>
+    <div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:8px;">
+      <span class="tag t-o">Object/Scene Detection</span>
+      <span class="tag t-o">Facial Analysis</span>
+      <span class="tag t-o">Face Search &amp; Verify</span>
+      <span class="tag t-o">Celebrity Recognition</span>
+      <span class="tag t-o">Text Detection</span>
+      <span class="tag t-o">Content Moderation</span>
+      <span class="tag t-o">Pathing (sports)</span>
+    </div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Custom Labels:</div>
+    <ul class="cl">
+      <li>Train Rekognition on YOUR images (only needs a few hundred)</li>
+      <li>Find your own logos, products, custom objects</li>
+      <li>Upload labeled images → creates custom model</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Content Moderation:</div>
+    <ul class="cl">
+      <li>Detect inappropriate/offensive content in images &amp; video</li>
+      <li>Reduces human review to <strong>1–5%</strong> of content volume</li>
+      <li>Integrated with <strong>Amazon A2I</strong> for human review of low-confidence results</li>
+      <li><strong>Custom Moderation Adaptors:</strong> Provide your own labeled images to extend/enhance moderation</li>
+      <li>API: <code>DetectModerationLabels</code></li>
+    </ul>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Rekognition + A2I = human-in-the-loop for low-confidence moderation. Custom Labels needs only hundreds of images.</div>
+  </div>
+
+  <!-- Lex + Kendra -->
+  <div class="svc svc-green">
+    <div class="stitle green">💬 Chatbots &amp; Search</div>
+    <div class="svc-name nm-green">Amazon Lex</div>
+    <ul class="cl">
+      <li>Build chatbots with <strong>voice + text</strong> using deep learning</li>
+      <li>Supports multiple languages</li>
+      <li>Understands user <strong>intent</strong> → invokes Lambda to "fulfill the intent"</li>
+      <li>Asks for <strong>Slots</strong> (input parameters) when needed</li>
+      <li>Integrates with: Lambda, Connect, Comprehend, Kendra</li>
+    </ul>
+    <div style="margin-top:9px;">
+      <div class="svc-name nm-green">Amazon Kendra</div>
+    </div>
+    <ul class="cl">
+      <li>Fully managed <strong>document search</strong> powered by ML</li>
+      <li>Natural language search — answers from within documents</li>
+      <li>Supports: text, PDF, HTML, PowerPoint, MS Word, FAQs</li>
+      <li><strong>Incremental Learning:</strong> Learns from user feedback to promote preferred results</li>
+      <li>Manual fine-tuning: data importance, freshness, custom</li>
+    </ul>
+    <div style="margin-top:5px; font-size:11px; color:var(--text-dim); margin-bottom:3px; font-weight:600;">Kendra Data Sources:</div>
+    <div><span class="tag t-g">S3</span><span class="tag t-g">RDS</span><span class="tag t-g">Google Drive</span><span class="tag t-g">SharePoint</span><span class="tag t-g">OneDrive</span><span class="tag t-g">3rd party / Custom</span></div>
+    <div class="tip-c"><strong>⚡ Lex vs Kendra:</strong> Lex = chatbot conversations. Kendra = enterprise document search ("Where is the IT desk?" → "1st floor").</div>
+  </div>
+
+  <!-- A2I -->
+  <div class="svc svc-blue">
+    <div class="stitle blue">👤 Human-in-the-Loop</div>
+    <div class="svc-name nm-blue">Amazon Augmented AI (A2I)</div>
+    <ul class="cl">
+      <li>Human oversight of ML predictions <strong>in production</strong></li>
+      <li>High-confidence predictions → returned to app immediately</li>
+      <li>Low-confidence predictions → sent for <strong>human review</strong></li>
+      <li>Reviews consolidated with weighted scores → stored in S3</li>
+      <li>Reviewed data can be added back to training dataset</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Workforce Options:</div>
+    <ul class="cl">
+      <li>Your own employees</li>
+      <li><strong>500,000+ contractors</strong> from AWS</li>
+      <li><strong>Mechanical Turk</strong> (some pre-screened for confidentiality)</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Works with:</div>
+    <div><span class="tag t-b">Rekognition</span><span class="tag t-b">Textract</span><span class="tag t-b">Custom ML models</span><span class="tag t-b">SageMaker</span></div>
+    <div class="tip-g"><strong>⚡ Exam:</strong> A2I = human review for low-confidence ML predictions. Integrates tightly with Rekognition (content mod) and Textract (document extraction).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🎯 Recommendations, Anomalies & Fraud</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Personalize -->
+  <div class="svc svc-violet">
+    <div class="stitle violet">🎁 Recommendations</div>
+    <div class="svc-name nm-violet">Amazon Personalize</div>
+    <ul class="cl">
+      <li>Same tech used by Amazon.com for recommendations</li>
+      <li>Real-time personalized recommendations without building ML</li>
+      <li>Implement in days, not months</li>
+      <li>Integrates into: websites, apps, SMS, email marketing</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Recipes (algorithm presets):</div>
+    <div class="recipe">
+      <span class="recipe-type">USER_PERSONALIZATION</span><br>
+      <span class="recipe-name">User-Personalization-v2</span>
+      <span class="recipe-ex"> — items for a specific user</span>
+    </div>
+    <div class="recipe">
+      <span class="recipe-type">PERSONALIZED_RANKING</span><br>
+      <span class="recipe-name">Personalized-Ranking-v2</span>
+      <span class="recipe-ex"> — re-rank items for a user</span>
+    </div>
+    <div class="recipe">
+      <span class="recipe-type">POPULAR_ITEMS</span><br>
+      <span class="recipe-name">Trending-Now, Popularity-Count</span>
+      <span class="recipe-ex"> — trending/popular</span>
+    </div>
+    <div class="recipe">
+      <span class="recipe-type">RELATED_ITEMS</span><br>
+      <span class="recipe-name">Similar-Items</span>
+      <span class="recipe-ex"> — items similar to one item</span>
+    </div>
+    <div class="recipe">
+      <span class="recipe-type">PERSONALIZED_ACTIONS</span><br>
+      <span class="recipe-name">Next-Best-Action</span>
+      <span class="recipe-ex"> — what action to take next</span>
+    </div>
+    <div class="recipe">
+      <span class="recipe-type">USER_SEGMENTATION</span><br>
+      <span class="recipe-name">Item-Affinity</span>
+      <span class="recipe-ex"> — segment users by item affinity</span>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Personalize = recommendations ONLY. Recipes = algorithm presets. Must provide training config on top of each recipe.</div>
+  </div>
+
+  <!-- Lookout -->
+  <div class="svc svc-yellow">
+    <div class="stitle yellow">🔍 Anomaly Detection</div>
+    <div class="svc-name nm-yellow">Amazon Lookout</div>
+    <ul class="cl">
+      <li>ML-powered anomaly detection — detects unusual variances</li>
+      <li><strong>Measure</strong> = the metric being optimized</li>
+      <li><strong>Dimensions</strong> = features that influence the measure</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Three Flavors:</div>
+    <table class="tbl">
+      <thead><tr><th>Service</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Lookout for Metrics</td>
+          <td>Business KPIs: revenue, ad campaigns, user metrics. Inputs: S3, Redshift, Athena, CloudWatch, Salesforce, Marketo. Outputs: SNS, Lambda.</td>
+        </tr>
+        <tr>
+          <td>Lookout for Equipment</td>
+          <td>Industrial sensors → predictive maintenance. Detect equipment failures early.</td>
+        </tr>
+        <tr>
+          <td>Lookout for Vision</td>
+          <td>Visual quality inspection via computer vision (manufacturing defects).</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tip-c"><strong>⚡ Exam:</strong> Lookout for Metrics = business anomalies. Lookout for Equipment = IoT/industrial sensors. Lookout for Vision = visual quality inspection.</div>
+  </div>
+
+  <!-- Fraud Detector -->
+  <div class="svc svc-red">
+    <div class="stitle red">🚨 Fraud Detection</div>
+    <div class="svc-name nm-red">Amazon Fraud Detector</div>
+    <ul class="cl">
+      <li>Fully managed ML for fraud detection</li>
+      <li>Automatic model creation, continuous learning</li>
+      <li>Feature importance insights (model variables)</li>
+      <li>Ingests data from <strong>S3 or API</strong></li>
+      <li>Supports rule-based actions</li>
+      <li>SageMaker integration</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Fraud Examples:</div>
+    <div><span class="tag t-r">Online payments</span><span class="tag t-r">New accounts</span><span class="tag t-r">Trial abuse</span><span class="tag t-r">Account takeovers</span></div>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Workflow:</div>
+    <ul class="cl">
+      <li>Choose use case → create event type + entities</li>
+      <li>Define data source → define labels</li>
+      <li>Create + train model → review performance → deploy</li>
+    </ul>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Fraud Detector = automatic ML for fraud, no ML expertise needed. Handles ETL + feature engineering + model selection + training + deployment internally.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🤖 Amazon Q — Generative AI Assistants</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <!-- Q Business -->
+  <div class="svc svc-lime">
+    <div class="stitle lime">🏢 Enterprise AI</div>
+    <div class="svc-name nm-lime">Amazon Q Business</div>
+    <ul class="cl">
+      <li>Fully managed GenAI assistant for <strong>employees</strong></li>
+      <li>Answers questions based on <strong>your company's data</strong></li>
+      <li>Built on Amazon Bedrock (<strong>cannot choose</strong> the underlying FM)</li>
+      <li>Perform routine actions: time-off requests, meeting invites</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Data Connectors (40+ sources — fully managed RAG):</div>
+    <div style="display:flex; flex-wrap:wrap; gap:3px; margin-bottom:8px;">
+      <span class="tag t-g">S3</span><span class="tag t-g">RDS</span><span class="tag t-g">Aurora</span><span class="tag t-g">WorkDocs</span><span class="tag t-g">MS 365</span><span class="tag t-g">Salesforce</span><span class="tag t-g">GDrive</span><span class="tag t-g">Gmail</span><span class="tag t-g">Slack</span><span class="tag t-g">SharePoint</span>
+    </div>
+    <div style="font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Plugins (3rd party actions):</div>
+    <div><span class="tag t-y">Jira</span><span class="tag t-y">ServiceNow</span><span class="tag t-y">Zendesk</span><span class="tag t-y">Salesforce</span><span class="tag t-y">Custom APIs</span></div>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:5px;">Security &amp; Controls:</div>
+    <ul class="cl">
+      <li><strong>IAM Identity Center</strong> required for authentication</li>
+      <li>Users only see docs they have access to</li>
+      <li>Supports external IdPs: Google Login, Microsoft AD</li>
+      <li><strong>Admin Controls (Guardrails):</strong> Block topics/words, restrict to internal info only, global + topic-level rules</li>
+    </ul>
+    <div style="margin-top:7px; font-size:11px; font-weight:700; color:var(--text); margin-bottom:4px;">Amazon Q Apps:</div>
+    <ul class="cl">
+      <li>Create GenAI-powered apps using <strong>natural language</strong> (no code)</li>
+      <li>Uses company's internal data + plugins</li>
+    </ul>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Q Business = employee-facing GenAI using YOUR data. Built on Bedrock but FM not selectable. Must use IAM Identity Center. Guardrails = Admin Controls.</div>
+  </div>
+
+  <!-- Q Developer + AI Hardware -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+
+    <div class="svc svc-cyan">
+      <div class="stitle cyan">👨‍💻 Developer AI</div>
+      <div class="svc-name nm-cyan">Amazon Q Developer</div>
+      <table class="tbl">
+        <thead><tr><th>Capability</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>AWS Docs Q&A</td><td>Answers about AWS docs + service selection</td></tr>
+          <tr><td>Account Resource Q&A</td><td>Query your own AWS resources ("list my Lambda functions")</td></tr>
+          <tr><td>CLI Suggestions</td><td>Suggests CLI commands to make account changes</td></tr>
+          <tr><td>Bill Analysis</td><td>Helps analyze costs and resolve billing issues</td></tr>
+          <tr><td>Code Companion</td><td>Real-time code suggestions + security scans (like GitHub Copilot). Java, JS, Python, TypeScript, C#…</td></tr>
+          <tr><td>Software Agent</td><td>Implement features, generate docs, bootstrap projects</td></tr>
+          <tr><td>IDE Extensions</td><td>VS Code, Visual Studio — completions, security scans, debugging</td></tr>
+        </tbody>
+      </table>
+      <div class="tip-c"><strong>⚡ Exam:</strong> Q Developer = developer-facing AI for coding + AWS account management. Q Business = employee-facing AI for company data.</div>
+    </div>
+
+    <div class="svc svc-orange">
+      <div class="stitle orange">⚡ AWS Custom AI Hardware</div>
+      <table class="tbl">
+        <thead><tr><th>Chip</th><th>Instance</th><th>Purpose</th><th>Savings</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>AWS Trainium</td>
+            <td>Trn1, Trn1n</td>
+            <td>Deep Learning training on 100B+ parameter models. 800 Gbps EFA networking.</td>
+            <td class="tag t-g" style="display:inline-block;">50% cost</td>
+          </tr>
+          <tr>
+            <td>AWS Inferentia</td>
+            <td>Inf1, Inf2</td>
+            <td>High-performance, low-cost inference. Up to 4x throughput.</td>
+            <td class="tag t-g" style="display:inline-block;">70% cost</td>
+          </tr>
+        </tbody>
+      </table>
+      <ul class="cl" style="margin-top:6px;">
+        <li>Both Trn &amp; Inf have the <strong>lowest environmental footprint</strong></li>
+        <li>GPU instances (P3, P4, P5, G3–G6) = general ML training/inference</li>
+      </ul>
+      <div class="tip-y"><strong>⚡ Exam:</strong> Trainium = training (50% cheaper). Inferentia = inference (70% cheaper, 4x throughput). Both are purpose-built AWS ML chips.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">🗺 Quick Reference — All Services at a Glance</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="svc svc-violet full">
+  <div class="stitle violet">📋 Master Service Reference Table</div>
+  <table class="tbl">
+    <thead>
+      <tr><th>Service</th><th>Category</th><th>Key Feature</th><th>Exam Keyword</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Amazon Comprehend</td><td>NLP</td><td>Sentiment, entities, key phrases, topics, language detection. Custom classification &amp; NER.</td><td>NLP, PII detection, text insights</td></tr>
+      <tr><td>Amazon Translate</td><td>Translation</td><td>Neural machine translation. Localize content at scale.</td><td>Language translation</td></tr>
+      <tr><td>Amazon Transcribe</td><td>Speech→Text</td><td>ASR. PII redaction. Toxicity detection. Custom Vocabularies + CLM for accuracy.</td><td>Speech-to-text, ASR, closed captions</td></tr>
+      <tr><td>Amazon Polly</td><td>Text→Speech</td><td>Lifelike TTS. SSML markup. Lexicons. Speech marks for lip-sync.</td><td>Text-to-speech, voice applications</td></tr>
+      <tr><td>Amazon Rekognition</td><td>Computer Vision</td><td>Objects, faces, celebrities, content moderation. Custom Labels (few hundred images). A2I integration.</td><td>Image/video analysis, content moderation</td></tr>
+      <tr><td>Amazon Textract</td><td>Document AI</td><td>Extract text + data from scanned forms, tables, PDFs. Structured output.</td><td>OCR, document extraction, forms</td></tr>
+      <tr><td>Amazon Lex</td><td>Chatbots</td><td>Voice+text chatbots. Intents + Slots. Lambda fulfillment. Connects to Comprehend, Kendra.</td><td>Chatbot, conversational AI, intents</td></tr>
+      <tr><td>Amazon Kendra</td><td>Enterprise Search</td><td>ML-powered document search. NL queries. Incremental learning from feedback.</td><td>Document search, enterprise knowledge base</td></tr>
+      <tr><td>Amazon Personalize</td><td>Recommendations</td><td>Same tech as Amazon.com. Recipes (prebuilt algorithms). Real-time personalization. Data from S3 or API.</td><td>Recommendations, personalization</td></tr>
+      <tr><td>Amazon Lookout for Metrics</td><td>Anomaly Detection</td><td>Business KPI anomalies. Detectors + measures + dimensions. Feedback loop.</td><td>Business anomalies, KPI monitoring</td></tr>
+      <tr><td>Amazon Lookout for Equipment</td><td>Anomaly Detection</td><td>Industrial equipment sensors → predictive maintenance.</td><td>Equipment sensors, predictive maintenance</td></tr>
+      <tr><td>Amazon Lookout for Vision</td><td>Anomaly Detection</td><td>Visual quality inspection via computer vision.</td><td>Visual defect detection, manufacturing</td></tr>
+      <tr><td>Amazon Fraud Detector</td><td>Fraud</td><td>Automated ML fraud detection. Continuous learning. Rule-based actions.</td><td>Fraud detection, account takeover</td></tr>
+      <tr><td>Amazon Augmented AI (A2I)</td><td>Human Review</td><td>Human-in-the-loop for low-confidence ML predictions. Works with Rekognition, Textract, custom models.</td><td>Human review, low-confidence predictions</td></tr>
+      <tr><td>Amazon Q Business</td><td>GenAI Assistant</td><td>Employee GenAI over company data. 40+ data connectors. IAM Identity Center required. Admin guardrails.</td><td>Employee AI assistant, RAG over company data</td></tr>
+      <tr><td>Amazon Q Developer</td><td>Developer AI</td><td>Coding companion + AWS account Q&A. IDE extensions. CLI suggestions.</td><td>Code generation, developer productivity</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="sec">⚠️ Exam Traps &amp; Key Distinctions</div>
+<!-- ═══════════════════════════════════════════════════ -->
+
+<div class="g2">
+  <div class="svc svc-yellow">
+    <div class="stitle yellow">🎯 Must-Know Distinctions</div>
+    <ul class="cl">
+      <li><strong>Comprehend vs Transcribe:</strong> Comprehend = analyze existing text. Transcribe = audio → text.</li>
+      <li><strong>Lex vs Kendra:</strong> Lex = chatbot conversations with intents. Kendra = search documents with NL questions.</li>
+      <li><strong>Rekognition vs Textract:</strong> Rekognition = images/video analysis. Textract = structured data from document scans.</li>
+      <li><strong>Q Business vs Q Developer:</strong> Q Business = employees + company data. Q Developer = developers + AWS/coding.</li>
+      <li><strong>Personalize Recipes:</strong> Always for recommendations. Different recipe = different recommendation strategy.</li>
+      <li><strong>Lookout flavors:</strong> Metrics = business KPIs. Equipment = industrial IoT. Vision = visual quality inspection.</li>
+      <li><strong>A2I workflow:</strong> High confidence → auto-approved. Low confidence → human review → improve training data.</li>
+      <li><strong>Custom Transcribe:</strong> Custom Vocabulary = specific words. Custom Language Model = domain context. Use BOTH for highest accuracy.</li>
+    </ul>
+  </div>
+  <div class="svc svc-red">
+    <div class="stitle red">⚠️ Common Exam Traps</div>
+    <ul class="cl">
+      <li>Q Business is built on Bedrock but <strong>you CANNOT choose the underlying FM</strong></li>
+      <li>Q Business requires <strong>IAM Identity Center</strong> — not just IAM users</li>
+      <li>Personalize Recipes = algorithm templates — you still need to provide training config</li>
+      <li>Rekognition Custom Labels needs only <strong>a few hundred images</strong> (not thousands)</li>
+      <li>A2I vendors can be pre-screened for <strong>confidentiality requirements</strong></li>
+      <li>Polly SSML uses XML tags — e.g., <code>&lt;break&gt;</code> to pause</li>
+      <li>Transcribe <strong>Toxicity Detection</strong> uses both speech cues (tone/pitch) AND text</li>
+      <li>Comprehend Custom Models can be <strong>copied cross-account</strong> (same region, need ARN)</li>
+      <li>Fraud Detector ingests from <strong>S3 or an API</strong> — not Kinesis directly</li>
+      <li>Trainium = <strong>training</strong> chips. Inferentia = <strong>inference</strong> chips. Don't confuse.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 03: AWS Managed AI Services</span>
+  <span class="pnum">3 / 12</span>
+</div>
+
+</body>
+</html>

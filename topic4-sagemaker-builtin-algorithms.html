@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 4: SageMaker Built-In Algorithms</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #080c10;
+    --surface: #0e1318;
+    --surface2: #141c23;
+    --border: #1a2530;
+    --teal: #2dd4bf;
+    --blue: #38bdf8;
+    --purple: #a78bfa;
+    --pink: #f472b6;
+    --orange: #fb923c;
+    --green: #34d399;
+    --yellow: #fcd34d;
+    --red: #f87171;
+    --lime: #bef264;
+    --sky: #7dd3fc;
+    --text: #dce8f0;
+    --dim: #5a7080;
+    --mono: 'Fira Code', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:var(--sans); font-size:12.5px; line-height:1.5; padding:18px; }
+
+  /* HEADER */
+  .hdr { background: linear-gradient(135deg,#080c10,#0d1820,#080c10); border:1px solid var(--teal); border-radius:12px; padding:18px 26px; margin-bottom:16px; position:relative; overflow:hidden; }
+  .hdr::after { content:''; position:absolute; bottom:-60px; right:-40px; width:240px; height:240px; background:radial-gradient(circle,rgba(45,212,191,0.07) 0%,transparent 70%); pointer-events:none; }
+  .hrow { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }
+  .tnum { font-family:var(--mono); font-size:11px; color:var(--teal); letter-spacing:2px; text-transform:uppercase; }
+  h1 { font-size:22px; font-weight:800; background:linear-gradient(90deg,var(--teal),var(--blue),var(--purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:4px 0 2px; }
+  .sub { color:var(--dim); font-size:11px; }
+  .bdg { background:var(--purple); color:white; font-family:var(--mono); font-size:10px; font-weight:700; padding:3px 9px; border-radius:4px; letter-spacing:1px; }
+
+  /* SECTION */
+  .sec { font-family:var(--mono); font-size:10px; color:var(--purple); text-transform:uppercase; letter-spacing:3px; margin:14px 0 8px; padding-bottom:4px; border-bottom:1px solid var(--border); }
+
+  /* GRID */
+  .g2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .g3 { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+  .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:10px; }
+  .full { margin-bottom:10px; }
+
+  /* ALGO CARD */
+  .ac { background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:11px; }
+  .ac-teal   { border-top:3px solid var(--teal); }
+  .ac-blue   { border-top:3px solid var(--blue); }
+  .ac-purple { border-top:3px solid var(--purple); }
+  .ac-pink   { border-top:3px solid var(--pink); }
+  .ac-orange { border-top:3px solid var(--orange); }
+  .ac-green  { border-top:3px solid var(--green); }
+  .ac-yellow { border-top:3px solid var(--yellow); }
+  .ac-red    { border-top:3px solid var(--red); }
+  .ac-lime   { border-top:3px solid var(--lime); }
+  .ac-sky    { border-top:3px solid var(--sky); }
+
+  /* ALGO NAME PILL */
+  .aname { display:inline-block; font-family:var(--mono); font-size:11px; font-weight:700; padding:2px 9px; border-radius:5px; margin-bottom:6px; }
+  .an-teal   { background:rgba(45,212,191,0.1);  color:var(--teal);   border:1px solid rgba(45,212,191,0.2); }
+  .an-blue   { background:rgba(56,189,248,0.1);  color:var(--blue);   border:1px solid rgba(56,189,248,0.2); }
+  .an-purple { background:rgba(167,139,250,0.12);color:var(--purple); border:1px solid rgba(167,139,250,0.25); }
+  .an-pink   { background:rgba(244,114,182,0.1); color:var(--pink);   border:1px solid rgba(244,114,182,0.2); }
+  .an-orange { background:rgba(251,146,60,0.1);  color:var(--orange); border:1px solid rgba(251,146,60,0.2); }
+  .an-green  { background:rgba(52,211,153,0.1);  color:var(--green);  border:1px solid rgba(52,211,153,0.2); }
+  .an-yellow { background:rgba(252,211,77,0.1);  color:var(--yellow); border:1px solid rgba(252,211,77,0.2); }
+  .an-red    { background:rgba(248,113,113,0.1); color:var(--red);    border:1px solid rgba(248,113,113,0.2); }
+  .an-lime   { background:rgba(190,242,100,0.1); color:var(--lime);   border:1px solid rgba(190,242,100,0.2); }
+  .an-sky    { background:rgba(125,211,252,0.1); color:var(--sky);    border:1px solid rgba(125,211,252,0.2); }
+
+  /* ROW LABEL */
+  .rl { font-family:var(--mono); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--dim); margin-top:6px; margin-bottom:2px; }
+
+  /* LIST */
+  ul.cl { list-style:none; }
+  ul.cl li { padding:2px 0 2px 13px; position:relative; color:var(--dim); font-size:11px; }
+  ul.cl li::before { content:'▸'; position:absolute; left:0; color:var(--teal); font-size:9px; top:4px; }
+  ul.cl li strong { color:var(--text); }
+
+  /* TAG */
+  .tag { display:inline-block; font-family:var(--mono); font-size:9px; padding:1px 6px; border-radius:3px; margin:1px 2px 1px 0; }
+  .t-t { background:rgba(45,212,191,0.1);  color:var(--teal);   border:1px solid rgba(45,212,191,0.2); }
+  .t-b { background:rgba(56,189,248,0.1);  color:var(--blue);   border:1px solid rgba(56,189,248,0.2); }
+  .t-p { background:rgba(167,139,250,0.12);color:var(--purple); border:1px solid rgba(167,139,250,0.2); }
+  .t-o { background:rgba(251,146,60,0.1);  color:var(--orange); border:1px solid rgba(251,146,60,0.2); }
+  .t-g { background:rgba(52,211,153,0.1);  color:var(--green);  border:1px solid rgba(52,211,153,0.2); }
+  .t-y { background:rgba(252,211,77,0.1);  color:var(--yellow); border:1px solid rgba(252,211,77,0.2); }
+  .t-r { background:rgba(248,113,113,0.1); color:var(--red);    border:1px solid rgba(248,113,113,0.2); }
+  .t-pk{ background:rgba(244,114,182,0.1); color:var(--pink);   border:1px solid rgba(244,114,182,0.2); }
+  .t-l { background:rgba(190,242,100,0.1); color:var(--lime);   border:1px solid rgba(190,242,100,0.2); }
+
+  /* TIP */
+  .tip-y { background:rgba(252,211,77,0.05); border:1px solid rgba(252,211,77,0.15); border-left:3px solid var(--yellow); border-radius:5px; padding:5px 8px; font-size:10px; color:var(--dim); margin-top:6px; }
+  .tip-y strong { color:var(--yellow); }
+  .tip-r { background:rgba(248,113,113,0.05); border:1px solid rgba(248,113,113,0.15); border-left:3px solid var(--red); border-radius:5px; padding:5px 8px; font-size:10px; color:var(--dim); margin-top:6px; }
+  .tip-r strong { color:var(--red); }
+  .tip-t { background:rgba(45,212,191,0.05); border:1px solid rgba(45,212,191,0.15); border-left:3px solid var(--teal); border-radius:5px; padding:5px 8px; font-size:10px; color:var(--dim); margin-top:6px; }
+  .tip-t strong { color:var(--teal); }
+  .tip-g { background:rgba(52,211,153,0.05); border:1px solid rgba(52,211,153,0.15); border-left:3px solid var(--green); border-radius:5px; padding:5px 8px; font-size:10px; color:var(--dim); margin-top:6px; }
+  .tip-g strong { color:var(--green); }
+
+  /* BIG TABLE */
+  .tbl { width:100%; border-collapse:collapse; font-size:10px; }
+  .tbl th { background:var(--surface2); padding:5px 7px; text-align:left; font-family:var(--mono); font-size:9px; letter-spacing:0.8px; text-transform:uppercase; color:var(--dim); border-bottom:1px solid var(--border); white-space:nowrap; }
+  .tbl td { padding:5px 7px; border-bottom:1px solid rgba(26,37,48,0.6); color:var(--dim); vertical-align:top; }
+  .tbl td:first-child { color:var(--text); font-weight:600; font-size:10px; white-space:nowrap; }
+  .tbl tr:last-child td { border-bottom:none; }
+  .supervised   { color:var(--teal); font-family:var(--mono); font-size:9px; }
+  .unsupervised { color:var(--orange); font-family:var(--mono); font-size:9px; }
+  .gpu-yes { color:var(--green); font-family:var(--mono); font-size:9px; }
+  .gpu-no  { color:var(--red);   font-family:var(--mono); font-size:9px; }
+
+  /* INSTANCE BOX */
+  .inst { background:var(--surface2); border-radius:5px; padding:6px 8px; margin-top:5px; font-size:10px; }
+  .inst-label { font-family:var(--mono); font-size:9px; color:var(--dim); margin-bottom:3px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* FOOTER */
+  .footer { margin-top:16px; padding-top:8px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-size:10px; color:var(--dim); font-family:var(--mono); }
+  .pnum { color:var(--teal); font-weight:700; }
+
+  @media (max-width:900px) { .g3,.g4 { grid-template-columns:1fr 1fr; } }
+  @media (max-width:600px) { .g2,.g3,.g4 { grid-template-columns:1fr; } body{padding:10px;} h1{font-size:18px;} }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hrow">
+    <div>
+      <div class="tnum">Topic 04 of 12</div>
+      <h1>SageMaker Built-In Algorithms</h1>
+      <div class="sub">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="bdg">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">📊 Supervised — Regression &amp; Classification</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Linear Learner -->
+  <div class="ac ac-teal">
+    <div class="aname an-teal">Linear Learner</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li><strong>Regression</strong> (numeric) or <strong>Classification</strong> (binary/multi-class)</li>
+      <li>Fits a line; uses linear threshold for classification</li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-t">RecordIO-Protobuf (Float32)</span> <span class="tag t-t">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">File or Pipe mode. First CSV column = label.</div>
+    <div class="rl">How it works</div>
+    <ul class="cl">
+      <li>Auto-normalizes training data</li>
+      <li>Stochastic gradient descent (Adam, AdaGrad, SGD)</li>
+      <li><strong>Multiple models optimized in parallel</strong> → best selected</li>
+      <li>L1 / L2 regularization tuning</li>
+    </ul>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-t">learning_rate</span><span class="tag t-t">mini_batch_size</span><span class="tag t-t">L1</span><span class="tag t-t">wd (L2)</span><span class="tag t-t">balance_multiclass_weights</span><span class="tag t-t">target_precision</span><span class="tag t-t">target_recall</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">CPU or GPU (single/multi-machine). <span class="tip-r" style="display:inline; border:none; background:none; padding:0; margin:0; font-size:10px;"><strong>Multi-GPU does NOT help.</strong></span></div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Linear Learner = regression + classification in one algo. target_precision/target_recall = hold one metric while maximizing the other.</div>
+  </div>
+
+  <!-- XGBoost -->
+  <div class="ac ac-blue">
+    <div class="aname an-blue">XGBoost</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Boosted decision trees — each new tree corrects errors of previous</li>
+      <li>Classification + Regression. Gradient descent minimizes loss.</li>
+      <li><strong>Kaggle competition winner</strong> — very popular</li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-b">CSV</span><span class="tag t-b">libsvm</span><span class="tag t-b">recordIO-protobuf</span><span class="tag t-b">Parquet</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Serialized with Pickle. Use as framework (sagemaker.xgboost) or built-in algo.</div>
+    <div class="rl">Key Hyperparameters</div>
+    <table style="width:100%; border-collapse:collapse; font-size:10px; margin-top:4px;">
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px; width:120px;">subsample</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">prevents overfitting</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">eta</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">step size shrinkage → prevent overfitting</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">gamma</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">min loss reduction for partition; larger = conservative</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">alpha/lambda</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">L1/L2 regularization; larger = more conservative</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">scale_pos_weight</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">imbalanced classes: sum(neg)/sum(pos)</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">max_depth</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">tree depth; too high → overfit</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:1px 4px;">eval_metric</td><td style="color:var(--dim); font-size:10px; padding:1px 4px;">AUC, error, rmse</td></tr>
+    </table>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>Memory-bound → M5</strong>. GPU: P2/P3 (set <code>tree_method=gpu_hist</code>). v1.5+: distributed GPU (set <code>use_dask_gpu_training=true</code>).</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> XGBoost = memory-bound (M5 preferred). scale_pos_weight = fix imbalanced classes. alpha=L1, lambda=L2, gamma=conservative splits.</div>
+  </div>
+
+  <!-- LightGBM -->
+  <div class="ac ac-purple">
+    <div class="aname an-purple">LightGBM</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Gradient Boosting Decision Tree (like XGBoost/CatBoost)</li>
+      <li>Extended with GOSS + EFB (Gradient-based One-Side Sampling + Exclusive Feature Bundling)</li>
+      <li>Classification, Regression, or <strong>Ranking</strong></li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-p">txt / csv</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Training + optional validation channels.</div>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-p">learning_rate</span><span class="tag t-p">num_leaves</span><span class="tag t-p">feature_fraction</span><span class="tag t-p">bagging_fraction</span><span class="tag t-p">bagging_freq</span><span class="tag t-p">max_depth</span><span class="tag t-p">min_data_in_leaf</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">Single or multi CPU. Memory-bound → <strong>M5 not C5</strong>. Define instances with instance_count.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ LightGBM vs XGBoost:</strong> LightGBM also does Ranking (XGBoost doesn't natively). Both memory-bound → M5. LightGBM input is txt/csv only.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">📝 NLP &amp; Sequence Algorithms</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Seq2Seq -->
+  <div class="ac ac-pink">
+    <div class="aname an-pink">Seq2Seq</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Input sequence of tokens → Output sequence of tokens</li>
+      <li>Machine Translation, Text Summarization, Speech-to-text</li>
+      <li>Implemented with <strong>RNN + CNN + Attention</strong></li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-pk">RecordIO-Protobuf</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;"><strong>Tokens must be INTEGERS</strong> (unusual!). Must provide training + validation + vocabulary files.</div>
+    <div class="rl">Optimization Metrics</div>
+    <div><span class="tag t-pk">Accuracy</span><span class="tag t-pk">BLEU score</span><span class="tag t-pk">Perplexity</span></div>
+    <div style="font-size:10px; color:var(--dim);">BLEU = compares against multiple reference translations.</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>GPU only (P3)</strong>. Single machine only (but multi-GPU on that machine OK). Training can take days.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Seq2Seq = GPU only, single machine. Tokens must be integers (not float). Three required data channels: train + validation + vocabulary.</div>
+  </div>
+
+  <!-- BlazingText -->
+  <div class="ac ac-orange">
+    <div class="aname an-orange">BlazingText</div>
+    <div class="rl">Two Modes</div>
+    <div style="background:var(--surface2); border-radius:5px; padding:7px; margin-bottom:5px;">
+      <div style="font-size:10px; font-weight:700; color:var(--orange); margin-bottom:3px;">Text Classification (Supervised)</div>
+      <div style="font-size:10px; color:var(--dim);">Predict labels for sentences. Web search, info retrieval. Input: <code>__label__X sentence…</code> or augmented manifest format.</div>
+    </div>
+    <div style="background:var(--surface2); border-radius:5px; padding:7px;">
+      <div style="font-size:10px; font-weight:700; color:var(--orange); margin-bottom:3px;">Word2Vec (Unsupervised)</div>
+      <div style="font-size:10px; color:var(--dim);">Creates word embeddings. Semantically similar words = vectors close together. <strong>Words only, not sentences/docs.</strong> Used in NLP: translation, sentiment.</div>
+      <div style="margin-top:4px;"><span class="tag t-o">cbow</span><span class="tag t-o">skipgram</span><span class="tag t-o">batch_skipgram</span></div>
+    </div>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-o">mode</span><span class="tag t-o">learning_rate</span><span class="tag t-o">window_size</span><span class="tag t-o">vector_dim</span><span class="tag t-o">word_ngrams</span><span class="tag t-o">epochs</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">cbow/skipgram: <strong>ml.p3.2xlarge</strong>. batch_skipgram: multi-CPU. Text classification &lt;2GB: C5; larger: P2/P3.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> BlazingText = text classification + Word2Vec. Word2Vec = words only (not sentences). batch_skipgram = multi-CPU (distributed).</div>
+  </div>
+
+  <!-- Object2Vec -->
+  <div class="ac ac-green">
+    <div class="aname an-green">Object2Vec</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Word2Vec generalized to <strong>arbitrary objects</strong></li>
+      <li>Creates dense embeddings of high-dimensional objects</li>
+      <li>Nearest neighbors, cluster visualization, recommendations, genre prediction</li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-g">JSON Lines</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Tokenized integer pairs: user-item, sentence-sentence, customer-customer, product-product.</div>
+    <div class="rl">Architecture</div>
+    <ul class="cl">
+      <li>Two input channels → two <strong>encoders</strong> → comparator → FFNN</li>
+      <li>Encoder choices: avg-pooled embeddings, CNNs, Bidirectional LSTM</li>
+    </ul>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-g">enc1_network</span><span class="tag t-g">enc2_network</span><span class="tag t-g">dropout</span><span class="tag t-g">epochs</span><span class="tag t-g">learning_rate</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Encoder options: <code>hcnn</code>, <code>bilstm</code>, <code>pooled_embedding</code></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>Single machine only</strong> (multi-GPU OK). ml.m5.2xlarge, ml.p2.xlarge. Inference: ml.p3.2xlarge. Set <code>INFERENCE_PREFERRED_MODE</code> for encoder embeddings.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> Object2Vec = Word2Vec for ANY objects. Single machine only. Two encoders + comparator architecture.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">⏱ Time Series &amp; Forecasting</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g2">
+
+  <!-- DeepAR -->
+  <div class="ac ac-yellow">
+    <div class="aname an-yellow">DeepAR</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Forecasting <strong>1D time series</strong> data using <strong>RNNs</strong></li>
+      <li>Train ONE model on <strong>many related time series</strong> simultaneously</li>
+      <li>Automatically finds frequencies and seasonality</li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-y">JSON Lines</span><span class="tag t-y">Gzip</span><span class="tag t-y">Parquet</span></div>
+    <div style="margin-top:5px; background:var(--surface2); border-radius:5px; padding:6px; font-family:var(--mono); font-size:10px; color:var(--dim);">
+      Required: <span style="color:var(--yellow)">start</span> (timestamp), <span style="color:var(--yellow)">target</span> (values)<br>
+      Optional: <span style="color:var(--text)">dynamic_feat</span> (promotions, etc.), <span style="color:var(--text)">cat</span> (categorical)
+    </div>
+    <div class="rl">Best Practices</div>
+    <ul class="cl">
+      <li>Always include <strong>entire time series</strong> for train/test/inference</li>
+      <li>Train on many time series, not just one</li>
+      <li>Don't use prediction length &gt; 400</li>
+      <li>context_length can be smaller than seasonality (model lags 1 year)</li>
+    </ul>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-y">context_length</span><span class="tag t-y">epochs</span><span class="tag t-y">mini_batch_size</span><span class="tag t-y">learning_rate</span><span class="tag t-y">num_cells</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">CPU or GPU, single or multi. Start CPU (ml.c4.2xlarge). GPU helps only for larger models or batch &gt;512. <strong>CPU-only for inference.</strong></div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> DeepAR = time series forecasting with RNNs. Key strength = one model for MANY time series. Always use full time series. CPU for inference.</div>
+  </div>
+
+  <!-- Random Cut Forest -->
+  <div class="ac ac-red">
+    <div class="aname an-red">Random Cut Forest</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li><strong>Anomaly detection</strong> — Unsupervised</li>
+      <li>Detects spikes, breaks in periodicity, unclassifiable points</li>
+      <li>Assigns an <strong>anomaly score</strong> to each data point</li>
+      <li>Amazon's own algorithm (they're very proud of it 😄)</li>
+    </ul>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-r">RecordIO-Protobuf</span><span class="tag t-r">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">File or Pipe mode. Optional test channel for accuracy/precision/recall/F1.</div>
+    <div class="rl">How it works</div>
+    <ul class="cl">
+      <li>Forest of trees = partitions of training data</li>
+      <li>Measures expected complexity change when adding a point</li>
+      <li>Also works on <strong>streaming data (Kinesis Analytics)</strong></li>
+    </ul>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-r">num_trees</span><span class="tag t-r">num_samples_per_tree</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">num_trees↑ = less noise. num_samples_per_tree: 1/value ≈ ratio of anomalous to normal data.</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>Does NOT benefit from GPU.</strong> Training: M4, C4, C5. Inference: ml.c5.xl.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> RCF = anomaly detection (unsupervised). No GPU benefit. Also in QuickSight + Kinesis Analytics (streaming). num_samples_per_tree set based on anomaly ratio.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">🖼 Computer Vision Algorithms</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- Image Classification -->
+  <div class="ac ac-blue">
+    <div class="aname an-blue">Image Classification</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Assigns <strong>one or more labels</strong> to whole image</li>
+      <li>Doesn't locate objects — just classifies what's IN the image</li>
+    </ul>
+    <div class="rl">Variants &amp; Modes</div>
+    <table style="width:100%; border-collapse:collapse; font-size:10px; margin:4px 0;">
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:2px 4px; width:70px;">MXNet</td><td style="color:var(--dim); font-size:10px; padding:2px 4px;">Full training (random weights) OR Transfer learning (pretrained + random top layer). Default: 3ch 224×224.</td></tr>
+      <tr><td style="color:var(--blue); font-family:var(--mono); font-size:9px; padding:2px 4px;">TensorFlow</td><td style="color:var(--dim); font-size:10px; padding:2px 4px;">TF Hub models: MobileNet, Inception, ResNet, EfficientNet. Top layer fine-tunable.</td></tr>
+    </table>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-b">RecordIO</span><span class="tag t-b">Image format (jpg/png)</span><span class="tag t-b">Augmented Manifest</span></div>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-b">batch_size</span><span class="tag t-b">learning_rate</span><span class="tag t-b">optimizer</span><span class="tag t-b">weight_decay</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>GPU for training</strong> (p2, p3, g4dn, g5). Multi-GPU + multi-machine OK. CPU or GPU for inference.</div>
+    </div>
+  </div>
+
+  <!-- Object Detection -->
+  <div class="ac ac-orange">
+    <div class="aname an-orange">Object Detection</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Identifies ALL objects in image with <strong>bounding boxes</strong></li>
+      <li>Outputs: object categories + confidence scores</li>
+      <li>Train from scratch OR use pretrained (ImageNet)</li>
+    </ul>
+    <div class="rl">Variants</div>
+    <table style="width:100%; border-collapse:collapse; font-size:10px; margin:4px 0;">
+      <tr><td style="color:var(--orange); font-family:var(--mono); font-size:9px; padding:2px 4px; width:70px;">MXNet</td><td style="color:var(--dim); font-size:10px; padding:2px 4px;">CNN + <strong>SSD (Single Shot multibox Detector)</strong>. Backbone: VGG-16 or ResNet-50. Internal augmentation (flip, rescale, jitter).</td></tr>
+      <tr><td style="color:var(--orange); font-family:var(--mono); font-size:9px; padding:2px 4px;">TensorFlow</td><td style="color:var(--dim); font-size:10px; padding:2px 4px;">ResNet, EfficientNet, MobileNet from TF Model Garden.</td></tr>
+    </table>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-o">RecordIO</span><span class="tag t-o">jpg/png + JSON annotations</span></div>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-o">mini_batch_size</span><span class="tag t-o">learning_rate</span><span class="tag t-o">optimizer (sgd, adam, rmsprop, adadelta)</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>GPU for training</strong>. Multi-GPU + multi-machine OK. CPU or GPU for inference.</div>
+    </div>
+  </div>
+
+  <!-- Semantic Segmentation -->
+  <div class="ac ac-purple">
+    <div class="aname an-purple">Semantic Segmentation</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li><strong>Pixel-level</strong> object classification</li>
+      <li>Produces a <strong>segmentation mask</strong></li>
+      <li>Use cases: self-driving, medical imaging, robot sensing</li>
+    </ul>
+    <div style="margin-top:5px; padding:5px; background:var(--surface2); border-radius:4px; font-size:10px; color:var(--dim);">
+      ≠ Image Classification (whole image labels)<br>
+      ≠ Object Detection (bounding boxes)<br>
+      ✅ Pixel-by-pixel classification
+    </div>
+    <div class="rl">Input Format</div>
+    <div><span class="tag t-p">JPG images</span><span class="tag t-p">PNG annotations</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Label maps for annotations. Augmented manifest for Pipe mode.</div>
+    <div class="rl">Algorithms &amp; Backbones</div>
+    <div style="font-size:10px; color:var(--dim);">Built on MXNet Gluon CV.</div>
+    <div><span class="tag t-p">FCN</span><span class="tag t-p">PSP</span><span class="tag t-p">DeepLabV3</span></div>
+    <div><span class="tag t-p">ResNet50</span><span class="tag t-p">ResNet101</span></div>
+    <div class="rl">Key Hyperparameters</div>
+    <div><span class="tag t-p">algorithm</span><span class="tag t-p">backbone</span><span class="tag t-p">epochs</span><span class="tag t-p">learning_rate</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>GPU for training</strong>. Multi-GPU + multi-machine OK.</div>
+    </div>
+    <div class="tip-t"><strong>⚡ Vision hierarchy:</strong> Image Classification (what's in image) → Object Detection (where is it, with box) → Semantic Segmentation (exact pixel outline)</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">📂 Topic Modeling, Clustering &amp; Dimensionality</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g4">
+
+  <!-- NTM -->
+  <div class="ac ac-teal">
+    <div class="aname an-teal">NTM</div>
+    <div style="font-size:10px; color:var(--dim); margin-bottom:5px;">Neural Topic Model</div>
+    <ul class="cl">
+      <li>Organize docs into <strong>topics</strong> (unsupervised)</li>
+      <li>Algorithm: Neural Variational Inference</li>
+      <li>You define how many topics</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-t">recordIO-protobuf</span><span class="tag t-t">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Words tokenized to integers. 4 channels: train (required), validation, test, auxiliary (vocabulary).</div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-t">num_topics</span><span class="tag t-t">mini_batch_size</span><span class="tag t-t">learning_rate</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">GPU for training. CPU for inference (cheaper).</div>
+    </div>
+  </div>
+
+  <!-- LDA -->
+  <div class="ac ac-green">
+    <div class="aname an-green">LDA</div>
+    <div style="font-size:10px; color:var(--dim); margin-bottom:5px;">Latent Dirichlet Allocation</div>
+    <ul class="cl">
+      <li>Topic modeling — <strong>not deep learning</strong></li>
+      <li>Unsupervised; topics are unlabeled groupings</li>
+      <li>Also for: customer clustering by purchases, music harmonic analysis</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-g">recordIO-protobuf</span><span class="tag t-g">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Pipe mode: recordIO only.</div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-g">num_topics</span><span class="tag t-g">alpha0</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">alpha0 small = sparse topics. alpha0 &gt;1.0 = uniform topics.</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>Single-instance CPU only.</strong></div>
+    </div>
+    <div class="tip-g"><strong>LDA vs NTM:</strong> Both topic modeling. LDA = CPU-based, cheaper. NTM = deep learning, GPU. Try both!</div>
+  </div>
+
+  <!-- K-Means -->
+  <div class="ac ac-pink">
+    <div class="aname an-pink">K-Means</div>
+    <div style="font-size:10px; color:var(--dim); margin-bottom:5px;">Unsupervised Clustering</div>
+    <ul class="cl">
+      <li>Divide into K groups by Euclidean distance</li>
+      <li>"Extra" centers → reduced to k (k=k*x). Uses k-means++ init.</li>
+      <li>Lloyd's method for final reduction</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-pk">recordIO-protobuf</span><span class="tag t-pk">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Train: ShardedByS3Key. Test: FullyReplicated.</div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-pk">K!</span><span class="tag t-pk">mini_batch_size</span><span class="tag t-pk">extra_center_factor</span><span class="tag t-pk">init_method</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Choose K: use <strong>Elbow Method</strong> (plot within-cluster sum of squares).</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>CPU recommended</strong>. GPU: only 1 GPU per instance used → ml.g4dn.xlarge if GPU.</div>
+    </div>
+  </div>
+
+  <!-- PCA -->
+  <div class="ac ac-sky">
+    <div class="aname an-sky">PCA</div>
+    <div style="font-size:10px; color:var(--dim); margin-bottom:5px;">Principal Component Analysis</div>
+    <ul class="cl">
+      <li>Dimensionality reduction (unsupervised)</li>
+      <li>Projects to fewer dimensions preserving max variance</li>
+      <li>First component = largest variability</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-b">recordIO-protobuf</span><span class="tag t-b">CSV</span></div>
+    <div class="rl">Modes</div>
+    <div style="font-size:10px; color:var(--dim);">Uses covariance matrix + SVD decomposition.</div>
+    <div><span class="tag t-b">Regular</span><div style="display:inline; font-size:9px; color:var(--dim); margin-left:3px;">sparse data, moderate obs/features</div></div>
+    <div style="margin-top:2px;"><span class="tag t-b">Randomized</span><div style="display:inline; font-size:9px; color:var(--dim); margin-left:3px;">large obs + features, approx algorithm</div></div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-b">algorithm_mode</span><span class="tag t-b">subtract_mean</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">GPU or CPU — depends on input data specifics.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">🔢 Specialized Algorithms</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="g3">
+
+  <!-- KNN -->
+  <div class="ac ac-lime">
+    <div class="aname an-lime">KNN</div>
+    <div style="font-size:10px; color:var(--dim); margin-bottom:5px;">K-Nearest Neighbors</div>
+    <ul class="cl">
+      <li><strong>Classification</strong>: return most frequent label of K nearest points</li>
+      <li><strong>Regression</strong>: return average value of K nearest points</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-l">recordIO-protobuf</span><span class="tag t-l">CSV</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">First column = label. Test channel emits accuracy or MSE.</div>
+    <div class="rl">Pipeline</div>
+    <div style="font-size:10px; color:var(--dim);">Sample → Dimensionality reduction (sign/fjlt methods) → Build index → Serialize → Query with K</div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-l">K!</span><span class="tag t-l">sample_size</span></div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;">Train: CPU or GPU (m5.2xl, p2.xl). Inference: <strong>CPU for low latency, GPU for large batch throughput.</strong></div>
+    </div>
+  </div>
+
+  <!-- Factorization Machines -->
+  <div class="ac ac-orange">
+    <div class="aname an-orange">Factorization Machines</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Handles <strong>sparse data</strong>: click prediction, item recommendations</li>
+      <li>Supervised: classification or regression</li>
+      <li><strong>Pair-wise interactions only</strong> (user → item)</li>
+      <li>Usually for <strong>recommender systems</strong></li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-o">recordIO-protobuf (Float32)</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;"><strong>CSV not practical</strong> (too sparse).</div>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-o">Initialization methods</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Bias, factors, linear terms: uniform, normal, constant.</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>CPU recommended</strong>. GPU only works with DENSE data.</div>
+    </div>
+    <div class="tip-y"><strong>⚡ Exam:</strong> FM = sparse data + recommendations. recordIO-protobuf only. CPU recommended. GPU only for dense data.</div>
+  </div>
+
+  <!-- IP Insights -->
+  <div class="ac ac-red">
+    <div class="aname an-red">IP Insights</div>
+    <div class="rl">What it does</div>
+    <ul class="cl">
+      <li>Unsupervised learning of <strong>IP address usage patterns</strong></li>
+      <li>Identifies suspicious/anomalous IP behavior</li>
+      <li>Detect: anomalous logins, resources created from unusual IPs</li>
+    </ul>
+    <div class="rl">Input</div>
+    <div><span class="tag t-r">CSV only</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">Format: Entity, IP. No preprocessing needed. Optional validation (computes AUC).</div>
+    <div class="rl">How it works</div>
+    <ul class="cl">
+      <li>Neural network learns latent vector reps of entities + IPs</li>
+      <li>Entities hashed + embedded (need large hash size)</li>
+      <li>Auto-generates negative samples (random entity-IP pairs)</li>
+    </ul>
+    <div class="rl">Key HPs</div>
+    <div><span class="tag t-r">num_entity_vectors</span><span class="tag t-r">vector_dim</span><span class="tag t-r">epochs</span></div>
+    <div style="font-size:10px; color:var(--dim); margin-top:2px;">num_entity_vectors hash size = 2× unique entity IDs. vector_dim too large → overfit.</div>
+    <div class="inst">
+      <div class="inst-label">Instances</div>
+      <div style="color:var(--text); font-size:10px;"><strong>GPU recommended</strong> (ml.p3.2xlarge+, multi-GPU OK). CPU size depends on vector_dim + num_entity_vectors.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div class="sec">🗺 Master Algorithm Reference — All 14 Algorithms</div>
+<!-- ═══════════════════════════════════════════════ -->
+
+<div class="ac ac-purple full">
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Algorithm</th><th>Type</th><th>Task</th><th>Input Format</th><th>GPU?</th><th>Multi-Machine?</th><th>Key Exam Fact</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Linear Learner</td><td><span class="supervised">Supervised</span></td><td>Classification + Regression</td><td>RecordIO(Float32), CSV</td><td class="gpu-yes">✓ (Multi-GPU ✗)</td><td class="gpu-yes">✓</td><td>Multiple models in parallel, auto-normalize</td></tr>
+      <tr><td>XGBoost</td><td><span class="supervised">Supervised</span></td><td>Classification + Regression</td><td>CSV, libsvm, RecordIO, Parquet</td><td class="gpu-yes">✓ (set gpu_hist)</td><td class="gpu-yes">✓ v1.5+</td><td>Memory-bound → M5. Pickle serialization.</td></tr>
+      <tr><td>LightGBM</td><td><span class="supervised">Supervised</span></td><td>Class + Regression + <strong>Ranking</strong></td><td>txt/csv only</td><td class="gpu-no">✗</td><td class="gpu-yes">✓ CPU</td><td>GOSS + EFB extensions. Ranking capability.</td></tr>
+      <tr><td>Seq2Seq</td><td><span class="supervised">Supervised</span></td><td>Translation, Summarization</td><td>RecordIO (Integer tokens!)</td><td class="gpu-yes">GPU only</td><td class="gpu-no">Single machine only</td><td>Tokens = integers. Needs train+validation+vocab files.</td></tr>
+      <tr><td>BlazingText</td><td><span class="supervised">Supervised</span> / <span class="unsupervised">Unsupervised</span></td><td>Text Classification / Word2Vec</td><td>Text (__label__ format or plain)</td><td class="gpu-yes">✓ (cbow/skipgram)</td><td class="gpu-yes">✓ (batch_skipgram)</td><td>Word2Vec = words only, not sentences.</td></tr>
+      <tr><td>Object2Vec</td><td><span class="supervised">Supervised</span></td><td>Embeddings for arbitrary objects</td><td>JSON Lines (integer pairs)</td><td class="gpu-yes">✓ multi-GPU</td><td class="gpu-no">Single machine only</td><td>Two encoders + comparator. INFERENCE_PREFERRED_MODE.</td></tr>
+      <tr><td>DeepAR</td><td><span class="supervised">Supervised</span></td><td>Time Series Forecasting</td><td>JSON Lines / Gzip / Parquet</td><td class="gpu-yes">✓ (large models)</td><td class="gpu-yes">✓</td><td>One model, many time series. CPU for inference.</td></tr>
+      <tr><td>Image Classification</td><td><span class="supervised">Supervised</span></td><td>Image → Labels</td><td>RecordIO, jpg/png</td><td class="gpu-yes">GPU required</td><td class="gpu-yes">✓</td><td>What's in image (no location). Transfer learning supported.</td></tr>
+      <tr><td>Object Detection</td><td><span class="supervised">Supervised</span></td><td>Image → Bounding Boxes</td><td>RecordIO, jpg/png + JSON</td><td class="gpu-yes">GPU required</td><td class="gpu-yes">✓</td><td>SSD algorithm (MXNet). Where objects are.</td></tr>
+      <tr><td>Semantic Segmentation</td><td><span class="supervised">Supervised</span></td><td>Pixel-level Classification</td><td>JPG images + PNG annotations</td><td class="gpu-yes">GPU required</td><td class="gpu-yes">✓</td><td>FCN/PSP/DeepLabV3. Pixel-level mask output.</td></tr>
+      <tr><td>Random Cut Forest</td><td><span class="unsupervised">Unsupervised</span></td><td>Anomaly Detection</td><td>RecordIO, CSV</td><td class="gpu-no">No GPU benefit</td><td>Single or multi</td><td>M4/C4/C5. Also in Kinesis Analytics streaming.</td></tr>
+      <tr><td>NTM</td><td><span class="unsupervised">Unsupervised</span></td><td>Topic Modeling (deep learning)</td><td>RecordIO, CSV (integer tokens)</td><td class="gpu-yes">✓ for training</td><td>—</td><td>4 channels. Neural Variational Inference.</td></tr>
+      <tr><td>LDA</td><td><span class="unsupervised">Unsupervised</span></td><td>Topic Modeling (classical)</td><td>RecordIO, CSV</td><td class="gpu-no">CPU only</td><td class="gpu-no">Single instance</td><td>Cheaper than NTM. alpha0 controls sparsity.</td></tr>
+      <tr><td>K-Means</td><td><span class="unsupervised">Unsupervised</span></td><td>Clustering</td><td>RecordIO, CSV</td><td class="gpu-yes">CPU preferred</td><td>—</td><td>Elbow method to choose K. 1 GPU per instance if GPU.</td></tr>
+      <tr><td>PCA</td><td><span class="unsupervised">Unsupervised</span></td><td>Dimensionality Reduction</td><td>RecordIO, CSV</td><td class="gpu-yes">CPU or GPU</td><td>—</td><td>Regular (sparse) vs Randomized (large). SVD.</td></tr>
+      <tr><td>KNN</td><td><span class="supervised">Supervised</span></td><td>Classification + Regression</td><td>RecordIO, CSV</td><td class="gpu-yes">✓</td><td>—</td><td>CPU for low latency inference. GPU for batch throughput.</td></tr>
+      <tr><td>Factorization Machines</td><td><span class="supervised">Supervised</span></td><td>Sparse data, Recommendations</td><td>RecordIO only (Float32)</td><td class="gpu-yes">CPU recommended</td><td>—</td><td>Pair-wise only. GPU only for dense data.</td></tr>
+      <tr><td>IP Insights</td><td><span class="unsupervised">Unsupervised</span></td><td>IP Anomaly Detection</td><td>CSV only</td><td class="gpu-yes">GPU recommended</td><td>✓</td><td>Auto-generates negative samples. Hash size = 2× entities.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 04: SageMaker Built-In Algorithms</span>
+  <span class="pnum">4 / 12</span>
+</div>
+
+</body>
+</html>

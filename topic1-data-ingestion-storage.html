@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS MLA-C01 | Topic 1: Data Ingestion & Storage</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1e2d45;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #7c3aed;
+    --green: #10b981;
+    --yellow: #fbbf24;
+    --red: #ef4444;
+    --text: #e2e8f0;
+    --text-dim: #94a3b8;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 20px;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #0d1b2e 50%, #0a0e1a 100%);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 20px 28px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,212,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+  .exam-badge {
+    background: var(--accent3);
+    color: white;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .topic-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 6px 0 4px;
+  }
+  .subtitle { color: var(--text-dim); font-size: 12px; }
+
+  /* LAYOUT */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 14px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+  .full { margin-bottom: 14px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    position: relative;
+  }
+  .card-accent-blue { border-top: 3px solid var(--accent); }
+  .card-accent-orange { border-top: 3px solid var(--accent2); }
+  .card-accent-purple { border-top: 3px solid var(--accent3); }
+  .card-accent-green { border-top: 3px solid var(--green); }
+  .card-accent-yellow { border-top: 3px solid var(--yellow); }
+  .card-accent-red { border-top: 3px solid var(--red); }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .card-title .icon { font-size: 14px; }
+  .card-title.blue { color: var(--accent); }
+  .card-title.orange { color: var(--accent2); }
+  .card-title.purple { color: var(--accent3); }
+  .card-title.green { color: var(--green); }
+  .card-title.yellow { color: var(--yellow); }
+  .card-title.red { color: var(--red); }
+
+  /* TAGS / PILLS */
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    margin: 2px 2px 2px 0;
+  }
+  .tag-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+  .tag-orange { background: rgba(255,107,53,0.12); color: var(--accent2); border: 1px solid rgba(255,107,53,0.25); }
+  .tag-purple { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .tag-green { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+  .tag-yellow { background: rgba(251,191,36,0.12); color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
+  .tag-red { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.25); }
+
+  /* LISTS */
+  ul.checklist { list-style: none; }
+  ul.checklist li { padding: 3px 0; padding-left: 16px; position: relative; color: var(--text-dim); font-size: 12px; }
+  ul.checklist li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); font-size: 10px; top: 4px; }
+  ul.checklist li strong { color: var(--text); }
+
+  /* COMPARISON TABLE */
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .compare-table th {
+    background: var(--surface2);
+    padding: 7px 10px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    vertical-align: top;
+    color: var(--text-dim);
+  }
+  .compare-table td:first-child { color: var(--text); font-weight: 600; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .val-yes { color: var(--green); font-family: var(--mono); font-size: 10px; }
+  .val-no { color: var(--red); font-family: var(--mono); font-size: 10px; }
+
+  /* S3 STORAGE CLASS TABLE */
+  .s3-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .s3-table th {
+    background: rgba(0,212,255,0.08);
+    padding: 6px 8px;
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .s3-table td {
+    padding: 5px 8px;
+    border: 1px solid rgba(30,45,69,0.6);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+  .s3-table td:first-child { color: var(--text); font-weight: 600; font-size: 10px; }
+  .s3-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  .avail-99-99 { color: var(--green); font-family: var(--mono); font-size: 9px; }
+  .avail-99-9 { color: var(--yellow); font-family: var(--mono); font-size: 9px; }
+  .avail-low { color: var(--accent2); font-family: var(--mono); font-size: 9px; }
+
+  /* KINESIS CARD */
+  .kinesis-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    font-size: 12px;
+  }
+  .kinesis-row:last-child { border-bottom: none; }
+  .kinesis-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    min-width: 90px;
+    color: var(--accent);
+    font-weight: 700;
+    padding-top: 1px;
+  }
+  .kinesis-val { color: var(--text-dim); flex: 1; }
+  .kinesis-val strong { color: var(--text); }
+
+  /* ENCRYPTION TABLE */
+  .enc-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 6px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(30,45,69,0.5);
+    font-size: 11px;
+  }
+  .enc-row:last-child { border-bottom: none; }
+  .enc-type { font-family: var(--mono); font-size: 10px; color: var(--yellow); font-weight: 700; }
+  .enc-who { color: var(--text-dim); }
+  .enc-note { color: var(--text-dim); font-size: 10px; }
+
+  /* EXAM TIP BOX */
+  .exam-tip {
+    background: rgba(251,191,36,0.06);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-left: 3px solid var(--yellow);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  .exam-tip strong { color: var(--yellow); }
+
+  .warn-tip {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+  .warn-tip strong { color: var(--red); }
+
+  /* SECTION DIVIDER */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent3);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* FORMAT CARDS */
+  .format-card {
+    background: var(--surface2);
+    border-radius: 7px;
+    padding: 10px;
+    margin-bottom: 6px;
+  }
+  .format-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .format-desc { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+
+  /* PERFORMANCE STAT */
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(30,45,69,0.4); font-size: 11px; }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-label { color: var(--text-dim); }
+  .stat-val { font-family: var(--mono); color: var(--accent); font-size: 10px; font-weight: 700; }
+
+  /* MSK vs Kinesis */
+  .vs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .vs-col { padding: 0 10px; }
+  .vs-col:first-child { border-right: 1px solid var(--border); padding-left: 0; }
+  .vs-title { font-family: var(--mono); font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+  .vs-item { font-size: 11px; color: var(--text-dim); padding: 2px 0; }
+  .vs-item::before { content: '• '; color: var(--accent); }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: var(--mono);
+  }
+  .page-num { color: var(--accent); font-weight: 700; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .grid-2, .grid-4 { grid-template-columns: 1fr; }
+    body { padding: 10px; }
+    h1 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="topic-num">Topic 01 of 12</div>
+      <h1>Data Ingestion &amp; Storage</h1>
+      <div class="subtitle">AWS Certified Machine Learning Engineer Associate — MLA-C01</div>
+    </div>
+    <span class="exam-badge">MLA-C01</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">📦 Data Fundamentals</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-3">
+  <!-- Data Types -->
+  <div class="card card-accent-blue">
+    <div class="card-title blue"><span class="icon">🗂️</span> Data Types</div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--green)">Structured</div>
+      <div class="format-desc">Defined schema, rows &amp; columns. Easy to query.</div>
+      <div><span class="tag tag-green">CSV</span><span class="tag tag-green">Tables</span><span class="tag tag-green">Excel</span></div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--yellow)">Semi-Structured</div>
+      <div class="format-desc">Tags or patterns, flexible schema.</div>
+      <div><span class="tag tag-yellow">JSON</span><span class="tag tag-yellow">XML</span><span class="tag tag-yellow">Log files</span></div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--accent2)">Unstructured</div>
+      <div class="format-desc">No predefined schema. Needs preprocessing.</div>
+      <div><span class="tag tag-orange">Images</span><span class="tag tag-orange">Video</span><span class="tag tag-orange">Audio</span><span class="tag tag-orange">Emails</span></div>
+    </div>
+  </div>
+
+  <!-- 3 V's -->
+  <div class="card card-accent-purple">
+    <div class="card-title purple"><span class="icon">⚡</span> The 3 V's of Data</div>
+    <ul class="checklist">
+      <li><strong>Volume</strong> — Amount of data (GB → Petabytes). Challenge: storing &amp; processing at scale.</li>
+      <li style="margin-top:6px"><strong>Velocity</strong> — Speed of data generation. High velocity = real-time/near-real-time processing needed. <em>e.g., IoT sensors, HFT</em></li>
+      <li style="margin-top:6px"><strong>Variety</strong> — Different types &amp; sources. Mix of structured, semi, unstructured.</li>
+    </ul>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> Know which AWS service solves which V. Kinesis = Velocity, S3 = Volume, Glue = Variety.</div>
+  </div>
+
+  <!-- Data Formats -->
+  <div class="card card-accent-orange">
+    <div class="card-title orange"><span class="icon">📄</span> File Formats</div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--accent)">CSV</div>
+      <div class="format-desc">Human-readable, row-based. Small-medium datasets. ETL compatible.</div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--accent)">JSON</div>
+      <div class="format-desc">Key-value pairs. Flexible schema. Nested data. REST APIs, NoSQL.</div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--green)">Avro ⭐</div>
+      <div class="format-desc">Binary + schema embedded. Schema evolution support. Kafka, Spark, Flink.</div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--yellow)">Parquet ⭐</div>
+      <div class="format-desc">Columnar format. Best for analytics (read specific columns). Athena saves 30–90% cost.</div>
+    </div>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> Parquet = columnar = analytics + cost savings in Athena/Redshift Spectrum. Avro = schema evolution + streaming.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">🏛️ Data Architecture Patterns</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-2">
+  <!-- Warehouse vs Lake -->
+  <div class="card card-accent-blue">
+    <div class="card-title blue"><span class="icon">⚖️</span> Data Warehouse vs Data Lake vs Lakehouse</div>
+    <table class="compare-table">
+      <thead><tr><th>Aspect</th><th>Warehouse</th><th>Lake</th><th>Lakehouse</th></tr></thead>
+      <tbody>
+        <tr><td>Schema</td><td>On-Write (ETL)</td><td>On-Read (ELT)</td><td>Both</td></tr>
+        <tr><td>Data Types</td><td>Structured only</td><td>All types</td><td>All types</td></tr>
+        <tr><td>Agility</td><td class="val-no">Low</td><td class="val-yes">High</td><td class="val-yes">High</td></tr>
+        <tr><td>Cost</td><td class="val-no">Higher</td><td class="val-yes">Lower</td><td>Medium</td></tr>
+        <tr><td>AWS Service</td><td>Redshift</td><td>S3 + Glue + Athena</td><td>Lake Formation</td></tr>
+        <tr><td>ACID</td><td class="val-yes">Yes</td><td class="val-no">No (default)</td><td class="val-yes">Yes (Delta Lake)</td></tr>
+        <tr><td>Use when</td><td>BI &amp; analytics, structured, fast queries</td><td>ML, raw storage, uncertain future needs</td><td>Need both speed + flexibility</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ETL + Data Sources -->
+  <div class="card card-accent-green">
+    <div class="card-title green"><span class="icon">🔄</span> ETL Pipeline &amp; Data Sources</div>
+    <ul class="checklist">
+      <li><strong>Extract:</strong> Pull from databases, APIs, flat files, streams. Real-time or batch.</li>
+      <li><strong>Transform:</strong> Cleanse, enrich, reformat, aggregate, handle missing values.</li>
+      <li><strong>Load:</strong> Push to warehouse / data repo. Batch or streaming.</li>
+    </ul>
+    <div style="margin-top:10px; margin-bottom:6px; font-size:11px; color:var(--text-dim); font-weight:700;">ETL Orchestration Tools:</div>
+    <div style="margin-bottom:8px">
+      <span class="tag tag-orange">AWS Glue</span>
+      <span class="tag tag-orange">MWAA (Airflow)</span>
+      <span class="tag tag-orange">EventBridge</span>
+      <span class="tag tag-orange">Step Functions</span>
+      <span class="tag tag-orange">Lambda</span>
+    </div>
+    <div style="margin-bottom:6px; font-size:11px; color:var(--text-dim); font-weight:700;">Data Source Connections:</div>
+    <table class="compare-table">
+      <thead><tr><th>Type</th><th>Platform</th><th>Language</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>JDBC</td><td class="val-yes">Independent</td><td class="val-no">Java only</td><td>Relational DBs</td></tr>
+        <tr><td>ODBC</td><td class="val-no">Dependent</td><td class="val-yes">Any language</td><td>General DBs</td></tr>
+      </tbody>
+    </table>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> Data Mesh = governance paradigm (not a specific technology). Domain-based ownership with federated governance.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">🪣 Amazon S3 — Core Storage</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-3">
+  <!-- S3 Basics -->
+  <div class="card card-accent-blue">
+    <div class="card-title blue"><span class="icon">🪣</span> S3 Fundamentals</div>
+    <ul class="checklist">
+      <li><strong>Buckets:</strong> Globally unique name, region-level resource</li>
+      <li><strong>Objects:</strong> Max 5TB. Key = full path (prefix + name)</li>
+      <li><strong>Multi-part upload:</strong> Recommended &gt;100MB, required &gt;5GB</li>
+      <li><strong>Durability:</strong> 99.999999999% (11 9's) — all classes</li>
+      <li><strong>No "directories"</strong> — just long keys with slashes</li>
+    </ul>
+    <div style="margin-top:8px">
+      <div class="stat-row"><span class="stat-label">PUT/POST/DELETE per prefix/s</span><span class="stat-val">3,500</span></div>
+      <div class="stat-row"><span class="stat-label">GET/HEAD per prefix/s</span><span class="stat-val">5,500</span></div>
+      <div class="stat-row"><span class="stat-label">Latency</span><span class="stat-val">100–200ms</span></div>
+    </div>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> S3 performance = spread reads across multiple prefixes. 4 prefixes × 5,500 = 22,000 GET/s.</div>
+  </div>
+
+  <!-- S3 Security -->
+  <div class="card card-accent-purple">
+    <div class="card-title purple"><span class="icon">🔐</span> S3 Security</div>
+    <ul class="checklist">
+      <li><strong>IAM Policies:</strong> User/role-based, API-call level permissions</li>
+      <li><strong>Bucket Policies:</strong> JSON, resource-based, cross-account access</li>
+      <li><strong>ACLs:</strong> Object or bucket level (can be disabled)</li>
+      <li><strong>Access Points:</strong> Separate DNS + policy per prefix/team</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; color:var(--text-dim); font-weight:700; margin-bottom:4px;">Access Rule:</div>
+    <div style="background:var(--surface2); border-radius:5px; padding:7px; font-family:var(--mono); font-size:10px; color:var(--text-dim);">
+      IAM ALLOW <span style="color:var(--yellow)">OR</span> Resource Policy ALLOW<br>
+      <span style="color:var(--yellow)">AND</span> NO explicit DENY → ✅ Access
+    </div>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> Block Public Access can be set at account level. Bucket Policy evaluated before Default Encryption.</div>
+  </div>
+
+  <!-- S3 Features -->
+  <div class="card card-accent-green">
+    <div class="card-title green"><span class="icon">⚙️</span> S3 Key Features</div>
+    <ul class="checklist">
+      <li><strong>Versioning:</strong> Bucket-level. Protects from deletes. "null" version before enabling. Suspend doesn't delete versions.</li>
+      <li><strong>CRR</strong> (Cross-Region): Compliance, low latency, cross-account</li>
+      <li><strong>SRR</strong> (Same-Region): Log aggregation, test/prod sync</li>
+      <li><strong>S3 Object Lambda:</strong> Transform objects on retrieval via Lambda. Use for PII redaction, format conversion.</li>
+      <li><strong>Transfer Acceleration:</strong> Routes via edge location. Compatible with multi-part.</li>
+      <li><strong>Byte-Range Fetches:</strong> Parallel GETs, resilience, partial data retrieval.</li>
+    </ul>
+    <div class="warn-tip"><strong>🚫 Replication:</strong> Only NEW objects after enabling. No chaining (B1→B2→B3 doesn't replicate B1 to B3). Delete markers optional.</div>
+  </div>
+</div>
+
+<!-- S3 Storage Classes Table -->
+<div class="card card-accent-yellow full">
+  <div class="card-title yellow"><span class="icon">📊</span> S3 Storage Classes — Complete Comparison</div>
+  <table class="s3-table">
+    <thead>
+      <tr>
+        <th>Class</th>
+        <th>Availability</th>
+        <th>AZs</th>
+        <th>Min Storage</th>
+        <th>Min Obj Size</th>
+        <th>Retrieval Fee</th>
+        <th>Retrieval Time</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>S3 Standard</td>
+        <td><span class="avail-99-99">99.99%</span></td>
+        <td>≥3</td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+        <td>Instant</td>
+        <td>Frequently accessed data, Big Data analytics</td>
+      </tr>
+      <tr>
+        <td>Intelligent-Tiering</td>
+        <td><span class="avail-99-9">99.9%</span></td>
+        <td>≥3</td>
+        <td>None</td>
+        <td>None</td>
+        <td>None</td>
+        <td>Instant</td>
+        <td>Unknown access patterns. Auto-moves between tiers.</td>
+      </tr>
+      <tr>
+        <td>Standard-IA</td>
+        <td><span class="avail-99-9">99.9%</span></td>
+        <td>≥3</td>
+        <td>30 days</td>
+        <td>128 KB</td>
+        <td>Per GB</td>
+        <td>Instant</td>
+        <td>Disaster recovery, backups (infrequent but fast)</td>
+      </tr>
+      <tr>
+        <td>One Zone-IA</td>
+        <td><span class="avail-low">99.5%</span></td>
+        <td><span style="color:var(--red)">1</span></td>
+        <td>30 days</td>
+        <td>128 KB</td>
+        <td>Per GB</td>
+        <td>Instant</td>
+        <td>Secondary backups, recreatable data. ⚠️ AZ loss = data loss</td>
+      </tr>
+      <tr>
+        <td>Glacier Instant</td>
+        <td><span class="avail-99-9">99.9%</span></td>
+        <td>≥3</td>
+        <td>90 days</td>
+        <td>128 KB</td>
+        <td>Per GB</td>
+        <td>Milliseconds</td>
+        <td>Archive accessed once a quarter</td>
+      </tr>
+      <tr>
+        <td>Glacier Flexible</td>
+        <td><span class="avail-99-99">99.99%</span></td>
+        <td>≥3</td>
+        <td>90 days</td>
+        <td>40 KB</td>
+        <td>Per GB</td>
+        <td>1–5min / 3–5hr / 5–12hr</td>
+        <td>Archive, not needed urgently. Bulk retrieval is free.</td>
+      </tr>
+      <tr>
+        <td>Glacier Deep Archive</td>
+        <td><span class="avail-99-99">99.99%</span></td>
+        <td>≥3</td>
+        <td>180 days</td>
+        <td>40 KB</td>
+        <td>Per GB</td>
+        <td>12hr / 48hr</td>
+        <td>Long-term compliance storage. Cheapest: $0.00099/GB/mo</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="exam-tip" style="margin-top:10px"><strong>⚡ Intelligent-Tiering Tiers:</strong> Frequent (default) → Infrequent (30 days) → Archive Instant (90 days) → Archive Access (optional 90–700d) → Deep Archive Access (optional 180–700d). No retrieval charges.</div>
+</div>
+
+<!-- S3 Encryption -->
+<div class="grid-2">
+  <div class="card card-accent-purple">
+    <div class="card-title purple"><span class="icon">🔒</span> S3 Encryption Methods</div>
+    <div class="enc-row" style="font-weight:700; color:var(--text); font-size:10px; padding-bottom:4px;">
+      <div>Type</div><div>Key Managed By</div><div>Notes</div>
+    </div>
+    <div class="enc-row">
+      <div class="enc-type">SSE-S3</div>
+      <div class="enc-who">AWS</div>
+      <div class="enc-note">AES-256. Default for new buckets. Header: "AES256"</div>
+    </div>
+    <div class="enc-row">
+      <div class="enc-type">SSE-KMS</div>
+      <div class="enc-who">AWS KMS</div>
+      <div class="enc-note">Audit via CloudTrail. Header: "aws:kms". ⚠️ KMS quota limits apply</div>
+    </div>
+    <div class="enc-row">
+      <div class="enc-type">SSE-C</div>
+      <div class="enc-who">Customer</div>
+      <div class="enc-note">HTTPS mandatory. Key in every HTTP header. AWS doesn't store key.</div>
+    </div>
+    <div class="enc-row">
+      <div class="enc-type">Client-Side</div>
+      <div class="enc-who">Customer</div>
+      <div class="enc-note">Encrypt before upload. Decrypt after download. Full control.</div>
+    </div>
+    <div class="exam-tip"><strong>⚡ Exam:</strong> SSE-C requires HTTPS. SSE-KMS has KMS quota limits (5500–30000/s by region). Bucket Policies evaluated BEFORE default encryption.</div>
+  </div>
+
+  <div class="card card-accent-orange">
+    <div class="card-title orange"><span class="icon">📅</span> S3 Lifecycle Rules &amp; Events</div>
+    <ul class="checklist">
+      <li><strong>Transition Actions:</strong> Move between storage classes after N days</li>
+      <li><strong>Expiration Actions:</strong> Delete objects/versions after N days</li>
+      <li><strong>Can target:</strong> Prefix (e.g., s3://bucket/mp3/*) or Tags</li>
+      <li><strong>S3 Analytics:</strong> Recommends transitions for Standard→Standard-IA. Daily report. 24–48h to start. Does NOT support One-Zone-IA or Glacier.</li>
+    </ul>
+    <div style="margin-top:8px; font-size:11px; color:var(--text-dim); font-weight:700; margin-bottom:4px;">Event Notifications:</div>
+    <ul class="checklist">
+      <li>Events → <strong>SNS, SQS, Lambda</strong> (need resource policies)</li>
+      <li>Via <strong>EventBridge</strong> → 18+ AWS services, JSON filtering, archive/replay</li>
+      <li>Delivery usually in seconds (sometimes &gt;1 minute)</li>
+    </ul>
+    <div class="exam-tip"><strong>📋 Scenario:</strong> Recover deleted objects immediately for 30 days, then within 48h for 1 year → Enable Versioning + Standard-IA (noncurrent) + Glacier Deep Archive.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">💾 Block, File & Parallel Storage</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-3">
+  <!-- EBS -->
+  <div class="card card-accent-orange">
+    <div class="card-title orange"><span class="icon">💽</span> EBS — Elastic Block Store</div>
+    <ul class="checklist">
+      <li>Network drive attached to EC2 (not physical)</li>
+      <li><strong>Locked to AZ</strong> — can't move without snapshot</li>
+      <li>1 instance at a time (except io1/io2 multi-attach)</li>
+      <li>Provisioned capacity (billed even if unused)</li>
+      <li>Root volume deleted on termination by default</li>
+      <li><strong>Elastic Volumes:</strong> Resize/change type without detach</li>
+      <li>Can only INCREASE size (not decrease)</li>
+    </ul>
+    <div class="exam-tip"><strong>⚡ Move EBS across AZ:</strong> Snapshot → Restore in new AZ.</div>
+  </div>
+
+  <!-- EFS -->
+  <div class="card card-accent-green">
+    <div class="card-title green"><span class="icon">📁</span> EFS — Elastic File System</div>
+    <ul class="checklist">
+      <li>Managed NFS. Mount on <strong>hundreds of EC2s</strong> across AZs</li>
+      <li>Linux only (POSIX / NFSv4.1)</li>
+      <li>Expensive (3x gp2), pay-per-use</li>
+      <li>Auto-scales to petabyte, no capacity planning</li>
+    </ul>
+    <div style="margin-top:6px; font-size:11px; color:var(--text-dim); font-weight:700;">Performance Modes:</div>
+    <ul class="checklist">
+      <li><strong>General Purpose</strong> (default): Low latency</li>
+      <li><strong>Max I/O:</strong> High throughput, high latency, big data</li>
+    </ul>
+    <div style="margin-top:6px; font-size:11px; color:var(--text-dim); font-weight:700;">Throughput Modes:</div>
+    <ul class="checklist">
+      <li><strong>Bursting:</strong> 50MiB/s per TB + bursts</li>
+      <li><strong>Provisioned:</strong> Fixed regardless of storage</li>
+      <li><strong>Elastic:</strong> Auto-scale (unpredictable workloads)</li>
+    </ul>
+    <div class="exam-tip"><strong>EFS vs EBS:</strong> EFS = shared multi-AZ NFS (Linux). EBS = single-instance block storage.</div>
+  </div>
+
+  <!-- FSx -->
+  <div class="card card-accent-red">
+    <div class="card-title red"><span class="icon">⚡</span> Amazon FSx — 3rd Party File Systems</div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--accent)">FSx for Lustre ⭐ (ML Critical)</div>
+      <div class="format-desc">Parallel distributed FS. Machine Learning, HPC. 100s GB/s, millions IOPS, sub-ms latency. Seamless S3 integration (read S3 as filesystem, write back to S3).</div>
+      <div><span class="tag tag-blue">Scratch (temp)</span><span class="tag tag-blue">Persistent (replicated)</span></div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--accent2)">FSx for Windows</div>
+      <div class="format-desc">SMB + NTFS. AD integration. Multi-AZ. Backed up to S3 daily.</div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--green)">FSx for NetApp ONTAP</div>
+      <div class="format-desc">NFS, SMB, iSCSI. Multi-OS. Auto-scaling. Point-in-time cloning.</div>
+    </div>
+    <div class="format-card">
+      <div class="format-name" style="color:var(--yellow)">FSx for OpenZFS</div>
+      <div class="format-desc">NFS v3/v4. 1M IOPS, &lt;0.5ms latency. Point-in-time cloning.</div>
+    </div>
+    <div class="exam-tip"><strong>⚡ ML Exam:</strong> FSx for Lustre is key for SageMaker training — scales to 100s GB/s, integrates with S3.</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">📡 Streaming Services</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-2">
+  <!-- Kinesis Data Streams -->
+  <div class="card card-accent-blue">
+    <div class="card-title blue"><span class="icon">🌊</span> Kinesis Data Streams</div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Purpose</div>
+      <div class="kinesis-val">Collect &amp; store real-time streaming data</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Retention</div>
+      <div class="kinesis-val"><strong>Up to 365 days</strong>. Replay capability. Data not deleted until expiry.</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Msg Size</div>
+      <div class="kinesis-val"><strong>Up to 10 MiB</strong> per record</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Ordering</div>
+      <div class="kinesis-val">Guaranteed per Partition ID</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Provisioned</div>
+      <div class="kinesis-val"><strong>1 MB/s in, 2 MB/s out</strong> per shard. Manual scaling. Pay per shard/hour.</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">On-Demand</div>
+      <div class="kinesis-val"><strong>4 MB/s in</strong> default. Auto-scales. Pay per GB.</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">Encryption</div>
+      <div class="kinesis-val">KMS at rest, HTTPS in flight</div>
+    </div>
+    <div class="kinesis-row">
+      <div class="kinesis-label">SDK Tools</div>
+      <div class="kinesis-val">KPL (producer), KCL (consumer)</div>
+    </div>
+    <div class="exam-tip"><strong>⚡ Troubleshoot:</strong> Slow reads → increase shards. Throttling → check hot shards, use random partition key, exponential backoff. Lambda issues → check IAM role + IteratorAge metric.</div>
+  </div>
+
+  <!-- Firehose + Flink -->
+  <div class="card card-accent-orange">
+    <div class="card-title orange"><span class="icon">🔥</span> Data Firehose &amp; Apache Flink</div>
+    <div style="font-size:11px; color:var(--accent2); font-weight:700; margin-bottom:6px;">Amazon Data Firehose (formerly Kinesis Data Firehose)</div>
+    <ul class="checklist">
+      <li>Fully managed, <strong>no data storage</strong>, no replay</li>
+      <li>Near real-time (buffered), auto-scaling, serverless</li>
+      <li>Destinations: <strong>S3, Redshift, OpenSearch</strong>, Splunk, Datadog, HTTP endpoint</li>
+      <li>Transforms: CSV→Parquet, gzip/snappy compression</li>
+      <li>Custom transforms via <strong>Lambda</strong></li>
+    </ul>
+    <div style="margin-top:10px; font-size:11px; color:var(--green); font-weight:700; margin-bottom:6px;">Managed Service for Apache Flink (MSAF)</div>
+    <ul class="checklist">
+      <li>Formerly "Kinesis Data Analytics for Apache Flink"</li>
+      <li>Write custom Flink apps (Java, Python, Scala)</li>
+      <li>Sources: Kinesis, MSK | Sinks: Kinesis, Firehose, S3</li>
+      <li>Use cases: Streaming ETL, real-time analytics, metrics</li>
+      <li><strong>RANDOM_CUT_FOREST</strong> = SQL anomaly detection on streams</li>
+    </ul>
+    <div class="exam-tip"><strong>⚡ Kinesis Streams vs Firehose:</strong> Streams = real-time + storage + replay + producer/consumer code. Firehose = fully managed + near-real-time + no storage + no replay.</div>
+  </div>
+</div>
+
+<!-- Kinesis vs MSK -->
+<div class="card card-accent-purple full">
+  <div class="card-title purple"><span class="icon">🆚</span> Kinesis Data Streams vs Amazon MSK (Managed Kafka)</div>
+  <div class="vs-grid">
+    <div class="vs-col">
+      <div class="vs-title" style="color:var(--accent)">Kinesis Data Streams</div>
+      <div class="vs-item">1 MB message size limit</div>
+      <div class="vs-item">Data Streams with Shards</div>
+      <div class="vs-item">Shard Splitting &amp; Merging (both ways)</div>
+      <div class="vs-item">TLS in-flight encryption</div>
+      <div class="vs-item">KMS at-rest encryption</div>
+      <div class="vs-item">Security: IAM policies only (AuthN+AuthZ)</div>
+      <div class="vs-item">AWS native, no Kafka knowledge needed</div>
+    </div>
+    <div class="vs-col">
+      <div class="vs-title" style="color:var(--accent3)">Amazon MSK (Kafka)</div>
+      <div class="vs-item">1MB default; configurable up to 10MB+</div>
+      <div class="vs-item">Kafka Topics with Partitions</div>
+      <div class="vs-item">Can ONLY add partitions (not remove)</div>
+      <div class="vs-item">PLAINTEXT or TLS in-flight</div>
+      <div class="vs-item">KMS at-rest on EBS</div>
+      <div class="vs-item">Security: mTLS + Kafka ACLs, SASL/SCRAM + ACLs, IAM</div>
+      <div class="vs-item">Deploy in VPC, multi-AZ (up to 3), EBS storage</div>
+    </div>
+  </div>
+  <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+    <div class="exam-tip" style="flex:1; min-width:200px"><strong>MSK Serverless:</strong> No capacity management. IAM Access Control. ~$0.75/cluster/hr.</div>
+    <div class="exam-tip" style="flex:1; min-width:200px"><strong>MSK Connect:</strong> Managed Kafka Connect workers. Connectors for S3, Redshift, OpenSearch, Debezium.</div>
+    <div class="exam-tip" style="flex:1; min-width:200px"><strong>⚡ Choose MSK when:</strong> Already using Kafka on-prem, need larger messages, or need Kafka-specific features (topics, ACLs).</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section-label">🎯 Exam Quick-Fire — Data Ingestion &amp; Storage</div>
+<!-- ═══════════════════════════════════════════════════════ -->
+
+<div class="grid-2">
+  <div class="card card-accent-yellow">
+    <div class="card-title yellow"><span class="icon">🎯</span> Key Facts to Memorize</div>
+    <ul class="checklist">
+      <li>S3 durability = <strong>11 9's (99.999999999%)</strong> — all classes</li>
+      <li>S3 Standard availability = <strong>99.99%</strong></li>
+      <li>Kinesis shard = <strong>1 MB/s in, 2 MB/s out</strong></li>
+      <li>S3 max object size = <strong>5 TB</strong>; multi-part required &gt;5 GB</li>
+      <li>Glacier Deep Archive = <strong>180 day</strong> min storage duration</li>
+      <li>S3 Glacier Flexible Retrieval = <strong>90 day</strong> min, Bulk is FREE</li>
+      <li>EFS = Linux only (POSIX), multi-AZ, more expensive than EBS</li>
+      <li>EBS = locked to AZ, 1 instance (except io1/io2 multi-attach)</li>
+      <li>FSx for Lustre integrates with <strong>S3</strong> for ML training data</li>
+      <li>Parquet saves <strong>30–90% cost</strong> in Athena queries</li>
+      <li>RANDOM_CUT_FOREST = anomaly detection in Kinesis Analytics</li>
+      <li>Data Lake = schema-on-read (ELT), Warehouse = schema-on-write (ETL)</li>
+    </ul>
+  </div>
+
+  <div class="card card-accent-red">
+    <div class="card-title red"><span class="icon">⚠️</span> Common Exam Traps</div>
+    <ul class="checklist">
+      <li>S3 is <strong>global service</strong> in UI but buckets are <strong>region-level</strong></li>
+      <li>Replication: only <strong>new objects</strong> after enabling. No chaining.</li>
+      <li>S3 Analytics only recommends Standard → Standard-IA, <strong>NOT Glacier</strong></li>
+      <li>SSE-C requires <strong>HTTPS</strong> (mandatory, not just recommended)</li>
+      <li>Kinesis Firehose = <strong>near</strong> real-time (buffered), NOT real-time</li>
+      <li>MSK can only <strong>add</strong> partitions, cannot remove them</li>
+      <li>EFS supports <strong>Linux only</strong> — NOT Windows</li>
+      <li>One Zone-IA: data lost if <strong>AZ is destroyed</strong></li>
+      <li>FSx Lustre Scratch = <strong>NOT replicated</strong> (temporary). Persistent = replicated within AZ.</li>
+      <li>Data Mesh = governance <strong>paradigm</strong>, not a specific technology</li>
+      <li>KMS quota: SSE-KMS uploads/downloads count toward <strong>KMS API limits</strong></li>
+      <li>S3 Object Lambda = transform on <strong>retrieval</strong> (not on write)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <span>AWS MLA-C01 Study Guide — Sundog Education / Datacumulus</span>
+  <span>Topic 01: Data Ingestion &amp; Storage</span>
+  <span class="page-num">1 / 12</span>
+</div>
+
+</body>
+</html>
